@@ -1,69 +1,62 @@
-import Image from "next/image";
+import { Hero } from "@/components/hero";
+import { PageTransition } from "@/components/page-transition";
+import { Container, Section, stagger } from "@/components/ui";
+import { ViewModeSwitch } from "@/components/view-mode";
+import { CaseStudyCard, EngineeringPrinciples, MoreLink, RecruiterSummary } from "@/components/content-blocks";
+import { ControlPlane, ExperienceLog } from "@/components/control-plane";
+import { caseStudies } from "@/content/profile";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <PageTransition className="flex flex-col">
+      <div data-order-recruiter="1">
+        <Hero />
+      </div>
+
+      <div data-order-recruiter="2" className="border-y border-line bg-bg/70 backdrop-blur-sm">
+        <Container className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <ViewModeSwitch />
+          <p className="text-xs text-faint">Changes what this page puts first. Nothing is hidden for good.</p>
+        </Container>
+      </div>
+
+      <div data-order-recruiter="3" className="view-only-recruiter">
+        <Section id="summary" label="Summary / 00" title="Who, what and why — in 30 seconds.">
+          <RecruiterSummary />
+        </Section>
+      </div>
+
+      <div data-order-recruiter="5">
+        <ControlPlane />
+      </div>
+
+      <div data-order-recruiter="4">
+        <ExperienceLog />
+      </div>
+
+      <div data-order-recruiter="7">
+        <Section id="principles" label="Principles / 05" title="Engineering principles">
+          <EngineeringPrinciples />
+        </Section>
+      </div>
+
+      <div data-order-recruiter="6">
+        <Section
+          id="work"
+          label="Work / 06"
+          title="Selected work"
+          intro="Real projects. What I can state is filled in; the rest is marked until it is written."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            {caseStudies.map((s, i) => (
+              <div key={s.id} {...stagger(i, 100)}>
+                <CaseStudyCard study={s} />
+              </div>
+            ))}
+          </div>
+          <MoreLink href="/work">All case studies</MoreLink>
+        </Section>
+      </div>
+    </PageTransition>
   );
 }

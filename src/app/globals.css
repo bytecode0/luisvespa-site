@@ -1,26 +1,682 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --bg: #0a0a0b;
+  --surface: #121214;
+  --surface-2: #161618;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --text: #fafafa;
+  --muted: #a1a1aa;
+  --faint: #85858f;
+  --accent: #3b82f6;
+  --accent-bright: #60a5fa;
+  --accent-soft: rgba(59, 130, 246, 0.12);
+  --human: #f2c46d;
+  --human-soft: rgba(242, 196, 109, 0.12);
+  --ok: #7dd3a8;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-soft: var(--accent-soft);
+  --color-human: var(--human);
+  --color-human-soft: var(--human-soft);
+  --color-ok: var(--ok);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+/* No body background: it would paint over the fixed dot field (html's background goes to the canvas). */
+body {
+  color: var(--text);
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Dot grid used inside headers and panels. */
+.grid-bg {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 80%);
+}
+
+/* ---------- Site-wide living dot field (fixed behind everything) ----------
+   Layer 1: quiet grey dots that drift slowly with scroll.
+   Layer 2: the same grid in blue, visible only in a radius around the cursor (a soft radar). */
+.dot-field,
+.dot-radar {
+  position: fixed;
+  inset: -48px 0 -48px 0;
+  pointer-events: none;
+  z-index: -1;
+  background-size: 24px 24px;
+}
+.dot-field {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+}
+.dot-radar {
+  background-image: radial-gradient(rgba(96, 165, 250, 0.6) 1.2px, transparent 1.4px);
+  mask-image: radial-gradient(220px circle at var(--cx, -999px) var(--cy, -999px), black, transparent 70%);
+}
+@supports (animation-timeline: scroll()) {
+  @keyframes dot-drift {
+    to { transform: translateY(-48px); }
+  }
+  .dot-field,
+  .dot-radar {
+    animation: dot-drift linear both;
+    animation-timeline: scroll(root);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Small technical label, e.g. "SECURITY / 02". */
+.label {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
+
+/* Animated flow along diagram edges. */
+@keyframes flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.edge-flow {
+  stroke-dasharray: 4 8;
+  animation: flow 1.6s linear infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.node-pulse {
+  animation: pulse-soft 3.2s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-up {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* ---------- Page transitions (React <ViewTransition>, see components/page-transition) ---------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-old(.page) {
+  animation: 200ms ease-in both vt-out;
+}
+::view-transition-new(.page) {
+  animation: 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 140ms both vt-in;
+}
+@keyframes vt-out {
+  to { opacity: 0; transform: translateY(-10px); filter: blur(3px); }
+}
+@keyframes vt-in {
+  from { opacity: 0; transform: translateY(16px); filter: blur(6px); }
+}
+
+/* ---------- Scroll reveal (activated by the boot script only when motion is allowed) ---------- */
+html[data-motion="on"] [data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  filter: blur(6px);
+  transition:
+    opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms),
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms),
+    filter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms);
+}
+html[data-motion="on"] [data-stagger] {
+  opacity: 0;
+  transform: translateY(14px) scale(0.985);
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--d, 0ms) + 120ms),
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--d, 0ms) + 120ms),
+    /* keep the hover transitions of the element itself */
+    translate 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    padding 0.3s ease;
+}
+html[data-motion="on"] [data-reveal].is-visible,
+html[data-motion="on"] .is-visible [data-stagger] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+/* Items that slide in from the left instead of rising (timeline entries). */
+html[data-motion="on"] [data-stagger].from-left {
+  transform: translateX(-28px);
+}
+html[data-motion="on"] .is-visible [data-stagger].from-left {
+  transform: none;
+}
+
+/* ---------- Headline word reveal ---------- */
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.4em); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.word-in {
+  display: inline-block;
+  animation: word-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+/* Same entrance for blocks and flex containers: keeps the element's own display. */
+.block-in {
+  animation: word-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* ---------- A light that runs through a sequence of steps ---------- */
+@keyframes seq-glow {
+  0%, 22%, 100% { box-shadow: 0 0 0 0 transparent; }
+  8% { box-shadow: 0 0 0 1px var(--glow, var(--accent)), 0 0 28px -6px var(--glow, var(--accent)); }
+}
+.seq-glow {
+  animation: seq-glow var(--cycle, 6s) ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * var(--step, 1s));
+}
+
+/* ---------- Data flowing along connectors ---------- */
+@keyframes flow-down {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(260%); }
+}
+.flow-line {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 1.75rem;
+  overflow: hidden;
+  background: var(--border-strong);
+}
+.flow-line::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 40%;
+  background: linear-gradient(to bottom, transparent, var(--flow, var(--accent)), transparent);
+  animation: flow-down 1.8s ease-in-out infinite;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes nudge-x {
+  0%, 100% { transform: translateX(0); opacity: 0.5; }
+  50% { transform: translateX(3px); opacity: 1; }
+}
+.nudge-x {
+  animation: nudge-x 1.6s ease-in-out infinite;
+}
+
+/* ---------- Cursor spotlight on cards (position set by InteractionLayer) ---------- */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(360px circle at var(--mx, -999px) var(--my, -999px), rgba(59, 130, 246, 0.1), transparent 45%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* ---------- Scroll progress under the header (scroll-driven, no JS) ---------- */
+.scroll-progress {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+@supports (animation-timeline: scroll()) {
+  @keyframes grow-x {
+    to { transform: scaleX(1); }
+  }
+  .scroll-progress {
+    animation: grow-x linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+/* ---------- Tech card (glass panel from the Control Plane design) ---------- */
+.tech-card {
+  background: rgba(22, 22, 24, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.3s ease,
+    translate 0.3s ease;
+}
+.tech-card:hover {
+  border-color: var(--accent);
+  translate: 0 -2px;
+}
+
+/* ---------- Control-plane spine: a vertical data bus that fills as you scroll ---------- */
+.spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: var(--border);
+  pointer-events: none;
+}
+.spine-fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: top;
+  transform: scaleY(var(--p, 0));
+  background: linear-gradient(to bottom, var(--accent), rgba(59, 130, 246, 0.35));
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+@keyframes packet-down {
+  0% { top: 0; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.spine-packet {
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  height: 36px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, transparent, var(--accent-bright));
+  box-shadow: 0 0 10px var(--accent);
+  animation: packet-down 7s linear infinite;
+  animation-delay: var(--d, 0s);
+}
+@keyframes spine-draw {
+  from { transform: scaleY(0); }
+}
+.spine-draw {
+  transform-origin: top;
+  animation: spine-draw 1.4s cubic-bezier(0.6, 0, 0.2, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Node on the spine: lights up when its module scrolls into view. */
+@keyframes node-ping {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(2.4); opacity: 0; }
+}
+.spine-node {
+  transition: border-color 0.5s, box-shadow 0.5s;
+}
+.is-visible .spine-node,
+.spine-node.is-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.08), 0 0 24px rgba(59, 130, 246, 0.35);
+}
+.spine-node::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1px solid var(--accent);
+  opacity: 0;
+}
+.is-visible .spine-node::after {
+  animation: node-ping 2.4s ease-out infinite;
+}
+
+/* ---------- Hero boot sequence ---------- */
+/* Typed text: each character switches on after its delay. Base state is visible (no JS / reduced motion). */
+@keyframes char-on {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.type-char {
+  animation: char-on 0.01s linear backwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+.caret {
+  display: inline-block;
+  width: 0.6ch;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: var(--accent);
+  animation: caret-blink 1s steps(1) infinite;
+}
+/* Headline lines rise from behind a mask. */
+@keyframes line-up {
+  from { transform: translateY(105%); }
+}
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+.line-mask > span {
+  display: inline-block;
+  animation: line-up 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: var(--d, 0ms);
+}
+/* The LV monogram draws its border on load. */
+@keyframes stroke-draw {
+  from { stroke-dashoffset: var(--len, 200); }
+}
+.draw-stroke {
+  stroke-dasharray: var(--len, 200);
+  animation: stroke-draw 1.2s cubic-bezier(0.6, 0, 0.2, 1) backwards;
+  animation-delay: var(--d, 0ms);
+}
+
+/* ---------- Phase 4: text that appears ---------- */
+/* Section titles rise from behind a mask when their section is revealed. */
+.reveal-title {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+.reveal-title > span {
+  display: inline-block;
+}
+html[data-motion="on"] [data-reveal] .reveal-title > span {
+  transform: translateY(105%);
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
+}
+html[data-motion="on"] [data-reveal].is-visible .reveal-title > span {
+  transform: none;
+}
+/* Terminal output: lines print one after another once the block is visible. */
+html[data-motion="on"] [data-reveal] .term-line {
+  opacity: 0;
+  transition: opacity 0s linear var(--d, 0ms);
+}
+html[data-motion="on"] [data-reveal].is-visible .term-line {
+  opacity: 1;
+}
+/* Typed text inside a revealed block waits until the block is visible. */
+html[data-motion="on"] [data-reveal]:not(.is-visible) .type-char {
+  opacity: 0;
+  animation: none;
+}
+
+/* ---------- Phase 5: cards ---------- */
+/* Cards enter from their own side, towards the spine. */
+html[data-motion="on"] [data-reveal] .enter-left,
+html[data-motion="on"] [data-reveal] .enter-right {
+  opacity: 0;
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms),
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0ms);
+}
+html[data-motion="on"] [data-reveal] .enter-left {
+  transform: translateX(-56px);
+}
+html[data-motion="on"] [data-reveal] .enter-right {
+  transform: translateX(56px);
+}
+html[data-motion="on"] [data-reveal].is-visible .enter-left,
+html[data-motion="on"] [data-reveal].is-visible .enter-right {
+  opacity: 1;
+  transform: none;
+}
+/* Connector drawn from the spine node out to each card. */
+.connector {
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(to right, var(--accent), rgba(59, 130, 246, 0.25));
+  transition: transform 0.6s cubic-bezier(0.6, 0, 0.2, 1) 0.5s;
+}
+.connector.to-left {
+  right: 50%;
+  width: calc(5% - 24px + 1px);
+  margin-right: 24px;
+  transform-origin: right;
+  background: linear-gradient(to left, var(--accent), rgba(59, 130, 246, 0.25));
+}
+.connector.to-right {
+  left: 50%;
+  width: calc(5% - 24px + 1px);
+  margin-left: 24px;
+  transform-origin: left;
+}
+html[data-motion="on"] [data-reveal]:not(.is-visible) .connector {
+  transform: scaleX(0);
+}
+
+/* A light running around the border of a card on hover. */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes spin-angle {
+  to { --angle: 360deg; }
+}
+.tech-card {
+  position: relative;
+}
+.tech-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  pointer-events: none;
+  background: conic-gradient(from var(--angle), transparent 0 65%, var(--accent-bright) 85%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tech-card:hover::after {
+  opacity: 1;
+  animation: spin-angle 2.4s linear infinite;
+}
+/* Subtle 3D tilt towards the cursor (angles set by InteractionLayer). */
+.tilt {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.25s ease-out;
+  will-change: transform;
+}
+
+/* Security pipeline bus: a packet crossing the four stages. */
+@keyframes packet-right {
+  0% { left: 0; opacity: 0; }
+  6% { opacity: 1; }
+  94% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.bus-packet {
+  position: absolute;
+  top: -1px;
+  width: 48px;
+  height: 3px;
+  margin-left: -48px;
+  border-radius: 2px;
+  background: linear-gradient(to right, transparent, var(--accent-bright));
+  box-shadow: 0 0 10px var(--accent);
+  animation: packet-right 4s linear infinite;
+}
+
+/* ---------- Phase 6: header ---------- */
+.site-header-inner {
+  height: 4rem;
+  transition: height 0.3s ease;
+}
+header[data-scrolled="true"] .site-header-inner {
+  height: 3.25rem;
+}
+header[data-scrolled="true"] {
+  background: rgba(10, 10, 11, 0.92);
+}
+@keyframes draw-x {
+  from { transform: scaleX(0); }
+}
+.draw-x {
+  transform-origin: left;
+  animation: draw-x 0.6s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+
+/* ---------- Phase 7: timeline dot ping ---------- */
+@keyframes dot-ping {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6); }
+  100% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+}
+html[data-motion="on"] .is-visible .ping-once {
+  animation: dot-ping 1.2s ease-out calc(var(--d, 0ms) + 300ms) 2;
+}
+.spine.spine-left {
+  left: 0;
+  transform: none;
+}
+
+/* ---------- About: "technical psychedelic" profile ---------- */
+/* Three soft lights (blue, violet, green) slowly rotating behind the section. */
+.psyche-bg {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface-2) 50%, var(--bg) 100%);
+}
+.psyche-bg::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(59, 130, 246, 0.09) 0%, transparent 45%),
+    radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.07) 0%, transparent 38%),
+    radial-gradient(circle at 70% 70%, rgba(16, 185, 129, 0.06) 0%, transparent 38%);
+  animation: psyche-rotate 28s linear infinite;
+}
+@keyframes psyche-rotate {
+  to { transform: rotate(360deg); }
+}
+.glass-cv {
+  background: rgba(22, 22, 24, 0.45);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+}
+/* Portrait glow: breathes slowly, brightens on hover. */
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50% { opacity: 0.9; transform: scale(1.04); }
+}
+.portrait-glow {
+  animation: glow-breathe 6s ease-in-out infinite;
+  transition: background-color 0.4s;
+}
+/* Endless band of company names. The list is rendered twice; the track moves by half its width. */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---------- Sound toggle ---------- */
+.sound-toggle {
+  display: inline-flex;
+}
+/* Sound is only offered when motion is allowed. */
+html:not([data-motion="on"]) .sound-toggle {
+  display: none;
+}
+@keyframes eq {
+  0%, 100% { height: 3px; }
+  50% { height: 12px; }
+}
+.eq-bar {
+  animation: eq 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ---------- View modes (Engineer / Recruiter / Deep dive) ----------
+   The home page is a flex column; each mode only changes section order
+   and which optional blocks show. No re-render needed. */
+.view-only-recruiter,
+.view-only-deep {
+  display: none;
+}
+[data-view="recruiter"] .view-only-recruiter,
+[data-view="deep"] .view-only-deep {
+  display: block;
+}
+[data-view="recruiter"] .view-hide-recruiter {
+  display: none;
+}
+
+[data-view="recruiter"] [data-order-recruiter="1"] { order: 1; }
+[data-view="recruiter"] [data-order-recruiter="2"] { order: 2; }
+[data-view="recruiter"] [data-order-recruiter="3"] { order: 3; }
+[data-view="recruiter"] [data-order-recruiter="4"] { order: 4; }
+[data-view="recruiter"] [data-order-recruiter="5"] { order: 5; }
+[data-view="recruiter"] [data-order-recruiter="6"] { order: 6; }
+[data-view="recruiter"] [data-order-recruiter="7"] { order: 7; }
+[data-view="recruiter"] [data-order-recruiter="8"] { order: 8; }
+[data-view="recruiter"] [data-order-recruiter="9"] { order: 9; }

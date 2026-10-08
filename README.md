@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# luisvespa.com
 
-## Getting Started
+Personal engineering site — Next.js (App Router), TypeScript, Tailwind CSS. Fully static.
 
-First, run the development server:
+## Edit
+
+| What | Where |
+| --- | --- |
+| Email, LinkedIn, GitHub, site URL, CV path | `src/config/site.ts` (links still set to `REPLACE-ME` are hidden) |
+| CV PDF | replace `public/cv/luis-vespa-cv.pdf` |
+| All facts: roles, skills, security, pipeline, case studies, notes, Ask Luis answers | `src/content/profile.ts` |
+
+Case-study sections set to `null` show an "Add real … here" placeholder until filled in.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run lint
+npm run build    # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Deploys as-is to Vercel or any static/Node host.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environments
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Environment | Git branch | Domain | Variables |
+| --- | --- | --- | --- |
+| Pre-production | `preprod` | `pre.luisvespa.com` | `NEXT_PUBLIC_SITE_ENV=preproduction`, `NEXT_PUBLIC_SITE_URL=https://pre.luisvespa.com` |
+| Production | `main` | `www.luisvespa.com` | none (defaults) |
 
-## Learn More
+Pre-production is never indexed (robots.txt `Disallow: /`, `noindex` meta tag and `X-Robots-Tag` header)
+and shows a small `PRE-PRODUCTION` badge. See `.env.example`.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy (Vercel)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push this repo to a personal GitHub repository.
+2. Vercel → Add New → Project → import the repository (framework: Next.js, defaults are fine).
+3. Settings → Environment Variables: add the two pre-production variables above, scoped to
+   **Preview** and the branch `preprod`.
+4. Settings → Domains: add `pre.luisvespa.com` and assign it to the Git branch `preprod`.
+   At your domain registrar, create `CNAME pre → cname.vercel-dns.com`.
+5. Every push to `preprod` deploys pre-production. Production = merge `preprod` into `main`
+   and add `luisvespa.com` / `www.luisvespa.com` to the project.
