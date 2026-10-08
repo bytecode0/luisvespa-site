@@ -18,7 +18,12 @@ type Props = {
 /** Page header: a mesh with the page's own character, and a title that resolves word by word. */
 export function PageIntro({ label, title, variant = "quiet", typed = false, visual, children }: Props) {
   const words = title.split(" ");
-  if (visual) return <VisualIntro label={label} title={title} visual={visual}>{children}</VisualIntro>;
+  if (visual)
+    return (
+      <VisualIntro label={label} title={title} visual={visual} variant={variant}>
+        {children}
+      </VisualIntro>
+    );
   return (
     <header className="relative overflow-hidden">
       <div className="grid-bg pointer-events-none absolute inset-0" aria-hidden />
@@ -58,12 +63,29 @@ export function PageIntro({ label, title, variant = "quiet", typed = false, visu
 }
 
 /** Banner header over a category key visual, with a scan line sweeping it on load (Control Plane design). */
-function VisualIntro({ label, title, visual, children }: { label: string; title: string; visual: { src: string; alt: string }; children?: ReactNode }) {
+function VisualIntro({
+  label,
+  title,
+  visual,
+  variant,
+  children,
+}: {
+  label: string;
+  title: string;
+  visual: { src: string; alt: string };
+  variant: MeshVariant;
+  children?: ReactNode;
+}) {
   const words = title.split(" ");
   return (
     <header className="relative flex min-h-[60vh] items-center overflow-hidden border-b border-line">
       <Image src={visual.src} alt={visual.alt} fill priority sizes="100vw" className="object-cover opacity-40 grayscale" />
       <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
+      {/* The animated network runs over the image, quieter behind the title so it stays readable. */}
+      <AgentMesh
+        variant={variant}
+        className="[mask-image:radial-gradient(ellipse_at_center,rgba(0,0,0,0.3)_20%,black_70%)]"
+      />
       <span aria-hidden className="scan-line scan-now" />
       <Container className="relative py-24 text-center">
         <p className="label fade-up text-accent">
