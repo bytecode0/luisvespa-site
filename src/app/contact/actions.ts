@@ -5,13 +5,16 @@ import { siteConfig } from "@/config/site";
 import { type ContactState, LIMITS, readFields, validateAll } from "@/lib/contact";
 
 /**
- * Contact form → email, via Resend's HTTP API (no SDK, no database: the message is only forwarded).
+ * Contact form → email, via Cloudflare Email Service's REST API (no SDK, no database: the message is
+ * only forwarded). Sending to a *verified destination address* of Email Routing is free on every plan.
  *
  * Environment (set in Vercel, never committed):
- *   RESEND_API_KEY        required to send. Without it: development logs the message; elsewhere it fails honestly.
- *   CONTACT_TO_EMAIL      inbox that receives messages (default: siteConfig.email)
- *   CONTACT_FROM_EMAIL    verified sender (default: "Luis Vespa — Website <contact@luisvespa.com>")
- *   TURNSTILE_SECRET_KEY  Cloudflare Turnstile; when set, every submission must pass it.
+ *   CLOUDFLARE_ACCOUNT_ID   Cloudflare account that owns luisvespa.com
+ *   CLOUDFLARE_EMAIL_TOKEN  API token with "Email Sending: Edit". Without it: development logs the
+ *                           message; elsewhere the form fails honestly and offers the email address.
+ *   CONTACT_TO_EMAIL        the verified Email Routing destination (your real inbox)
+ *   CONTACT_FROM_EMAIL      sender on the domain (default: contact@luisvespa.com)
+ *   TURNSTILE_SECRET_KEY    Cloudflare Turnstile; when set, every submission must pass it.
  */
 
 const recent = new Map<string, number[]>();
@@ -78,36 +81,45 @@ export async function sendContact(_prev: ContactState, form: FormData): Promise<
 <b>Company:</b> ${escapeHtml(company || "—")}<br><b>Reason:</b> ${escapeHtml(values.reason)}<br>
 Sent from ${escapeHtml(siteConfig.url)}/contact</p></div>`;
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const token = process.env.CLOUDFLARE_EMAIL_TOKEN;
+  const to = process.env.CONTACT_TO_EMAIL;
+  if (!accountId || !token || !to) {
     if (process.env.NODE_ENV !== "production") {
-      console.info("[contact] RESEND_API_KEY not set — message NOT sent (dev mode):\n", subject, "\n", text);
+      console.info("[contact] Cloudflare email not configured — message NOT sent (dev mode):\n", subject, "\n", text);
       return { status: "sent" };
     }
-    console.error("[contact] RESEND_API_KEY missing in this environment");
+    console.error("[contact] CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_EMAIL_TOKEN / CONTACT_TO_EMAIL missing");
     return { status: "error", values, message: "The form isn't connected yet. Please email me directly." };
   }
 
+  const failed = { status: "error" as const, values, message: "The message couldn't be delivered. Please try again or email me directly." };
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/email/sending/send`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: process.env.CONTACT_FROM_EMAIL || "Luis Vespa — Website <contact@luisvespa.com>",
-        to: [process.env.CONTACT_TO_EMAIL || siteConfig.email],
+        from: process.env.CONTACT_FROM_EMAIL || "contact@luisvespa.com",
+        to,
         reply_to: email,
         subject,
         text,
         html,
       }),
     });
-    if (!res.ok) {
-      console.error("[contact] Resend error", res.status, await res.text().catch(() => ""));
-      return { status: "error", values, message: "The message couldn't be delivered. Please try again or email me directly." };
+    const data = (await res.json().catch(() => ({}))) as {
+      success?: boolean;
+      errors?: { code?: number; message?: string }[];
+      result?: { delivered?: string[]; queued?: string[]; permanent_bounces?: string[] };
+    };
+    const accepted = (data.result?.delivered?.length ?? 0) + (data.result?.queued?.length ?? 0) > 0;
+    if (!res.ok || !data.success || !accepted) {
+      console.error("[contact] Cloudflare email error", res.status, JSON.stringify(data.errors ?? data.result ?? {}));
+      return failed;
     }
   } catch (err) {
-    console.error("[contact] Resend request failed", err);
-    return { status: "error", values, message: "The message couldn't be delivered. Please try again or email me directly." };
+    console.error("[contact] Cloudflare email request failed", err);
+    return failed;
   }
 
   return { status: "sent" };

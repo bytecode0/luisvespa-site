@@ -44,3 +44,22 @@ and shows a small `PRE-PRODUCTION` badge. See `.env.example`.
    At your domain registrar, create `CNAME pre → cname.vercel-dns.com`.
 5. Every push to `preprod` deploys pre-production. Production = merge `preprod` into `main`
    and add `luisvespa.com` / `www.luisvespa.com` to the project.
+
+## Contact form
+
+`/contact` posts to a server action (`src/app/contact/actions.ts`) that forwards the message through the
+**Cloudflare Email Service REST API** to the verified Email Routing destination (free on every plan).
+Nothing is stored. Anti-spam: honeypot, minimum fill time, per-instance throttle, optional Turnstile.
+
+Vercel environment variables (Production and Preview `preprod`; never committed):
+
+| Variable | Value |
+| --- | --- |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID of luisvespa.com |
+| `CLOUDFLARE_EMAIL_TOKEN` | API token with **Email Sending: Edit** |
+| `CONTACT_TO_EMAIL` | verified Email Routing destination (real inbox) |
+| `CONTACT_FROM_EMAIL` | optional, defaults to `contact@luisvespa.com` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | optional Turnstile keys |
+
+Without the Cloudflare variables, development logs the message instead of sending it, and deployed
+environments show an honest "not connected yet" message with the public email as fallback.
