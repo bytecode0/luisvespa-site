@@ -685,15 +685,6 @@ html[data-motion="on"] .group:hover .scan-line {
   animation: scan-sweep 2.4s linear infinite;
 }
 
-/* ---------- Shipped apps: phones float gently at different speeds ---------- */
-@keyframes float-y {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -14px; }
-}
-.float-slow { animation: float-y 8s ease-in-out infinite; }
-.float-mid { animation: float-y 6s ease-in-out infinite; }
-.float-fast { animation: float-y 5s ease-in-out infinite; }
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

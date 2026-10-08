@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { ArrowRight, Bot, Cpu, MapPin, ShieldCheck } from "lucide-react";
-import { apps, appForRole, roles } from "@/content/profile";
+import { appForRole, roles } from "@/content/profile";
 import { Scramble, Spine } from "@/components/motion";
 import { stagger } from "@/components/ui";
 import { KeyVisual } from "@/components/key-visual";
-import { AppThumb, ShippedAppsStrip } from "@/components/apps";
+import { AppThumb } from "@/components/apps";
 import { Portrait } from "@/components/portrait";
 import { AgentTrace } from "@/components/agent-trace";
 
@@ -103,7 +103,7 @@ function VisualModule(m: ModuleProps) {
 
 /* ---------- The control plane ---------- */
 
-/** Home: modules hanging off the central spine, the shipped-apps strip, then the experience log. */
+/** Home: modules hanging off the central spine (apps are shown in the experience log below). */
 export function ControlPlane() {
   return (
     <>
@@ -123,25 +123,7 @@ export function ControlPlane() {
           link={{ href: "/engineering", label: "DETAILED_SPECS" }}
           visualSide="left"
         />
-      </div>
 
-      {/* SHIPPED_APPS: real public apps from companies I worked at */}
-      <section aria-labelledby="shipped-title" data-reveal className="relative overflow-hidden border-y border-line bg-surface py-24">
-        <div aria-hidden className="grid-bg absolute inset-0 opacity-30" />
-        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="mb-16 flex items-center justify-between gap-6">
-            <h2 id="shipped-title" className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
-              <Scramble text="SHIPPED_PRODUCTION_APPS" trigger="view" />
-            </h2>
-            <span aria-hidden className="h-px flex-1 bg-line" />
-            <span className="font-mono text-[10px] uppercase text-muted">Public on Google Play</span>
-          </div>
-          <ShippedAppsStrip apps={apps} />
-        </div>
-      </section>
-
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-        <Spine />
         <VisualModule
           id="security"
           n="02"

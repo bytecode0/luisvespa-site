@@ -112,42 +112,6 @@ export function PlayLink({ href }: { href: string }) {
   );
 }
 
-/* ---------- Home: SHIPPED_APPS strip ---------- */
-
-const floats = ["float-slow", "float-mid mt-8 lg:mt-16", "float-fast mt-4 lg:mt-8"];
-
-function StripItem({ app, i }: { app: ShippedApp; i: number }) {
-  const { show, node } = useLightbox(app);
-  return (
-    <li className={`flex flex-col items-center gap-6 ${floats[i % floats.length]}`}>
-      <button type="button" onClick={() => show(0)} className="group relative block w-[200px] sm:w-[220px]" aria-label={`Open ${app.name} screenshots`}>
-        <ScreenCard src={app.screens[0].src} alt={app.screens[0].alt} className="transition-transform duration-500 group-hover:-translate-y-1" />
-        <span className="absolute inset-0 flex items-center justify-center rounded-[22px] bg-accent/20 opacity-0 transition-opacity group-hover:opacity-100">
-          <ZoomIn className="size-7 text-white" aria-hidden />
-        </span>
-      </button>
-      <div className="text-center font-mono">
-        <p className="text-xs font-bold uppercase text-ink">{app.name}</p>
-        <p className="mt-1 text-[9px] uppercase tracking-[0.12em] text-faint">
-          {app.company} · {app.period}
-        </p>
-      </div>
-      {node}
-    </li>
-  );
-}
-
-export function ShippedAppsStrip({ apps }: { apps: ShippedApp[] }) {
-  if (!apps.length) return null;
-  return (
-    <ul className="flex flex-wrap items-start justify-center gap-12 lg:gap-24">
-      {apps.map((a, i) => (
-        <StripItem key={a.slug} app={a} i={i} />
-      ))}
-    </ul>
-  );
-}
-
 /* ---------- Experience: compact phone thumbnail that opens the gallery ---------- */
 
 export function AppThumb({ app }: { app: ShippedApp }) {
