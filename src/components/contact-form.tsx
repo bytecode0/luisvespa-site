@@ -2,11 +2,12 @@
 
 import Script from "next/script";
 import { type CSSProperties, useActionState, useEffect, useRef, useState } from "react";
-import { ArrowRight, Mail, RotateCcw } from "lucide-react";
+import { ArrowRight, LoaderCircle, Mail, TriangleAlert } from "lucide-react";
 import { sendContact } from "@/app/contact/actions";
 import { siteConfig } from "@/config/site";
 import { type ContactFields, type ContactState, type FieldErrors, LIMITS, REASONS, validateField } from "@/lib/contact";
 import { sound } from "@/lib/sound";
+import { Scramble } from "@/components/motion";
 
 const EMPTY: ContactFields = { name: "", email: "", company: "", reason: "", message: "", consent: false };
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -14,26 +15,31 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const LOG = ["validating input", "checking for spam", "encrypting payload", "transmitting"];
 
 const inputBase =
-  "w-full border bg-bg/70 px-3.5 py-3 text-sm text-ink placeholder:text-faint transition-colors focus:outline-none focus:border-accent";
+  "w-full rounded-sm border bg-surface p-3 text-sm text-ink placeholder:text-faint transition-colors focus:border-accent focus:outline-none";
 
 function Field({
   id,
   label,
   error,
   hint,
+  meta,
   children,
 }: {
   id: string;
   label: string;
   error?: string;
   hint?: string;
+  meta?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="pb-3">
-      <label htmlFor={id} className="mb-2 block font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
-        {label}
-      </label>
+    <div className="pb-2">
+      <div className="mb-2 flex items-baseline justify-between">
+        <label htmlFor={id} className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+          <Scramble text={label} trigger="view" durationMs={600} delayMs={200} />
+        </label>
+        {meta ? <span className="font-mono text-[9px] text-faint">{meta}</span> : null}
+      </div>
       {children}
       <p id={`${id}-msg`} aria-live="polite" className={`mt-1.5 min-h-4 text-xs ${error ? "text-red-400" : "text-faint"}`}>
         {error ?? hint ?? ""}
@@ -81,20 +87,20 @@ export function ContactForm() {
   if (state.status === "sent" && !pending) {
     return (
       <div className="fade-up flex flex-col items-center py-12 text-center" role="status">
-        <svg viewBox="0 0 64 64" className="size-16" aria-hidden>
-          <circle cx="32" cy="32" r="30" fill="none" stroke="var(--human)" strokeWidth="2" className="draw-stroke" style={{ "--len": 190 } as CSSProperties} />
+        <svg viewBox="0 0 64 64" className="size-20" aria-hidden>
+          <circle cx="32" cy="32" r="29" fill="none" stroke="var(--human)" strokeWidth="3" className="draw-stroke" style={{ "--len": 190 } as CSSProperties} />
           <path d="M20 33 l8 8 l16 -18" fill="none" stroke="var(--human)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="draw-stroke" style={{ "--len": 50, "--d": "500ms" } as CSSProperties} />
         </svg>
-        <p className="mt-6 font-mono text-lg tracking-[0.12em] text-human">MESSAGE DELIVERED</p>
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">
+        <p className="mt-8 font-mono text-2xl font-bold tracking-[0.12em] text-human">MESSAGE DELIVERED</p>
+        <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-muted">
           Thanks{values.name ? `, ${values.name.trim().split(" ")[0]}` : ""}. Your message is in my inbox and I&rsquo;ll reply to the email you gave me.
         </p>
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="mt-8 inline-flex items-center gap-2 border border-line px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] text-muted transition-colors hover:border-accent hover:text-accent"
+          className="mt-8 font-mono text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:text-accent"
         >
-          <RotateCcw className="size-3.5" aria-hidden /> Send another
+          [ Send another ]
         </button>
       </div>
     );
@@ -119,6 +125,7 @@ export function ContactForm() {
       }}
       className="space-y-2"
     >
+      <div className={pending ? "hidden" : "space-y-2"}>
       {/* Anti-spam: humans never see or fill this field. */}
       <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label htmlFor="website">Website</label>
@@ -126,7 +133,7 @@ export function ContactForm() {
       </div>
       <input type="hidden" name="startedAt" value={startedAt || ""} />
 
-      <div className="grid gap-x-4 sm:grid-cols-2">
+      <div className="grid gap-x-6 sm:grid-cols-2">
         <Field id="name" label="Name *" error={errorFor("name")}>
           <input
             id="name"
@@ -156,7 +163,7 @@ export function ContactForm() {
             placeholder="you@company.com"
           />
         </Field>
-        <Field id="company" label="Company" error={errorFor("company")} hint="Optional">
+        <Field id="company" label="Company (optional)" error={errorFor("company")}>
           <input
             id="company"
             name="company"
@@ -167,7 +174,7 @@ export function ContactForm() {
             aria-invalid={Boolean(errorFor("company"))}
             aria-describedby="company-msg"
             className={`${inputBase} ${border("company")}`}
-            placeholder="Where you work"
+            placeholder="Org name"
           />
         </Field>
         <Field id="reason" label="About *" error={errorFor("reason")}>
@@ -182,7 +189,7 @@ export function ContactForm() {
             className={`${inputBase} ${border("reason")} appearance-none`}
           >
             <option value="" disabled>
-              Choose one…
+              Select topic
             </option>
             {REASONS.map((r) => (
               <option key={r} value={r}>
@@ -193,12 +200,7 @@ export function ContactForm() {
         </Field>
       </div>
 
-      <Field
-        id="message"
-        label="Message *"
-        error={errorFor("message")}
-        hint={`${values.message.trim().length} / ${LIMITS.message.max}`}
-      >
+      <Field id="message" label="Message *" error={errorFor("message")} meta={`${values.message.length}/${LIMITS.message.max}`}>
         <textarea
           id="message"
           name="message"
@@ -208,8 +210,8 @@ export function ContactForm() {
           onBlur={() => blur("message")}
           aria-invalid={Boolean(errorFor("message"))}
           aria-describedby="message-msg"
-          className={`${inputBase} ${border("message")} resize-y`}
-          placeholder="What would you like to talk about?"
+          className={`${inputBase} ${border("message")} resize-none`}
+          placeholder="Details of your request…"
           maxLength={LIMITS.message.max}
         />
       </Field>
@@ -244,13 +246,16 @@ export function ContactForm() {
           <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="dark" data-appearance="interaction-only" />
         </>
       ) : null}
+      </div>
 
       {state.status === "error" && !pending ? (
-        <div role="alert" className="fade-up border border-red-400/40 bg-red-400/5 p-4 text-sm text-ink">
-          <p>{state.message}</p>
+        <div role="alert" className="fade-up rounded-sm border border-red-500/50 bg-red-500/10 p-6 text-center">
+          <TriangleAlert className="mx-auto mb-3 size-6 text-red-400" aria-hidden />
+          <p className="font-mono text-sm font-bold uppercase tracking-[0.12em] text-ink">Transmission failed</p>
+          <p className="mt-2 text-xs text-muted">{state.message} Your text is still in the form below.</p>
           <a
             href={`mailto:${siteConfig.email}`}
-            className="mt-3 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent hover:text-ink"
+            className="mt-4 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent hover:text-ink"
           >
             <Mail className="size-3.5" aria-hidden /> {siteConfig.email}
           </a>
@@ -258,7 +263,7 @@ export function ContactForm() {
       ) : null}
 
       {pending ? (
-        <ol aria-live="polite" className="border border-line bg-[#07080a] p-4 font-mono text-xs leading-6">
+        <ol aria-live="polite" className="mb-6 rounded-sm border border-line bg-black/40 p-6 font-mono text-[11px] leading-6">
           {LOG.map((line, i) => (
             <li key={line} className="fade-up text-muted" style={{ animationDelay: `${i * 260}ms` }}>
               <span className="text-accent">&gt;</span> {line}…
@@ -271,10 +276,16 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={pending}
-          className="group inline-flex w-full items-center justify-center gap-2 bg-accent px-6 py-3.5 font-mono text-xs uppercase tracking-[0.12em] text-white transition-colors hover:bg-accent-bright disabled:opacity-60 sm:w-auto"
+          className={`group inline-flex w-full items-center justify-center gap-3 rounded-sm px-12 py-4 font-mono text-sm font-bold uppercase tracking-[0.14em] transition-colors md:w-auto ${
+            pending ? "cursor-wait border border-line bg-surface-2 text-muted" : "bg-accent text-white hover:bg-accent-bright"
+          }`}
         >
           {pending ? "Transmitting…" : "Send message"}
-          {pending ? null : <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />}
+          {pending ? (
+            <LoaderCircle className="size-4 animate-spin" aria-hidden />
+          ) : (
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
+          )}
         </button>
       </div>
     </form>

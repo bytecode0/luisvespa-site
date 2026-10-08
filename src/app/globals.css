@@ -619,6 +619,14 @@ html[data-motion="on"] .is-visible .ping-once {
   animation: glow-breathe 6s ease-in-out infinite;
   transition: background-color 0.4s;
 }
+/* Contact portrait: a glow that breathes around the frame. */
+@keyframes glow-shadow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1); }
+  50% { box-shadow: 0 0 44px rgba(59, 130, 246, 0.3); }
+}
+.portrait-glow-shadow {
+  animation: glow-shadow 8s ease-in-out infinite;
+}
 /* Endless band of company names. The list is rendered twice; the track moves by half its width. */
 @keyframes marquee {
   to { transform: translateX(-50%); }
