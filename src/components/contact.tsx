@@ -143,7 +143,10 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-col items-center justify-between gap-4 border-t border-line pt-8 md:flex-row">
           <p className="font-mono text-[10px] text-faint">
-            © {new Date().getFullYear()} LUIS VESPA · {siteConfig.location.toUpperCase()}
+            © {new Date().getFullYear()} LUIS VESPA · {siteConfig.location.toUpperCase()} ·{" "}
+            <Link href="/privacy" className="hover:text-accent">
+              PRIVACY
+            </Link>
           </p>
           <p className="font-mono text-[10px] text-faint">
             Press <kbd className="border border-line px-1.5 py-0.5">⌘</kbd>{" "}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Script from "next/script";
 import { type CSSProperties, useActionState, useEffect, useRef, useState } from "react";
 import { ArrowRight, LoaderCircle, Mail, TriangleAlert } from "lucide-react";
@@ -232,7 +233,10 @@ export function ContactForm() {
           />
           <span>
             I agree that Luis Vespa uses my name and email only to reply to this message. Nothing is stored on this
-            site; the message is forwarded to his inbox.
+            site; the message is forwarded to his inbox.{" "}
+            <Link href="/privacy" className="text-accent underline-offset-2 hover:underline">
+              Privacy
+            </Link>
           </span>
         </label>
         <p id="consent-msg" aria-live="polite" className="mt-1.5 min-h-4 text-xs text-red-400">
