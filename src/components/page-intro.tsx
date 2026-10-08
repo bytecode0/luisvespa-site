@@ -1,36 +1,30 @@
 import Image from "next/image";
 import { type CSSProperties, Fragment, type ReactNode } from "react";
 import { Container } from "@/components/ui";
-import { AgentMesh, type MeshVariant } from "@/components/agent-mesh";
 import { Scramble } from "@/components/motion";
 import { TypeText } from "@/components/type-text";
 
 type Props = {
   label: string;
   title: string;
-  variant?: MeshVariant;
   typed?: boolean;
   /** Category key visual: the header becomes a tall, centred "detailed spec" banner over the image. */
   visual?: { src: string; alt: string };
   children?: ReactNode;
 };
 
-/** Page header: a mesh with the page's own character, and a title that resolves word by word. */
-export function PageIntro({ label, title, variant = "quiet", typed = false, visual, children }: Props) {
+/** Page header: dot grid and a title that resolves word by word (the animated mesh is site-wide, see GlobalMesh). */
+export function PageIntro({ label, title, typed = false, visual, children }: Props) {
   const words = title.split(" ");
   if (visual)
     return (
-      <VisualIntro label={label} title={title} visual={visual} variant={variant}>
+      <VisualIntro label={label} title={title} visual={visual}>
         {children}
       </VisualIntro>
     );
   return (
     <header className="relative overflow-hidden">
       <div className="grid-bg pointer-events-none absolute inset-0" aria-hidden />
-      <AgentMesh
-        variant={variant}
-        className="[mask-image:linear-gradient(to_right,rgba(0,0,0,0.25),black_60%),linear-gradient(to_bottom,black_60%,transparent)] [mask-composite:intersect]"
-      />
       <Container className="relative pb-20 pt-16 sm:pb-28 sm:pt-28">
         <p className="label fade-up">
           <Scramble text={label.toUpperCase()} durationMs={700} />
@@ -67,13 +61,11 @@ function VisualIntro({
   label,
   title,
   visual,
-  variant,
   children,
 }: {
   label: string;
   title: string;
   visual: { src: string; alt: string };
-  variant: MeshVariant;
   children?: ReactNode;
 }) {
   const words = title.split(" ");
@@ -81,11 +73,6 @@ function VisualIntro({
     <header className="relative flex min-h-[60vh] items-center overflow-hidden border-b border-line">
       <Image src={visual.src} alt={visual.alt} fill priority sizes="100vw" className="object-cover opacity-40 grayscale" />
       <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-bg via-bg/40 to-bg" />
-      {/* The animated network runs over the image, quieter behind the title so it stays readable. */}
-      <AgentMesh
-        variant={variant}
-        className="[mask-image:radial-gradient(ellipse_at_center,rgba(0,0,0,0.3)_20%,black_70%)]"
-      />
       <span aria-hidden className="scan-line scan-now" />
       <Container className="relative py-24 text-center">
         <p className="label fade-up text-accent">

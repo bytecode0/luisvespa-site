@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function SecurityPage() {
   return (
     <PageTransition>
-      <PageIntro variant="security" visual={{ src: "/visuals/security.jpg", alt: "Glowing padlock inside concentric security rings and circuit traces" }} label="Detailed spec / 02" title="Security is architecture">
+      <PageIntro visual={{ src: "/visuals/security.jpg", alt: "Glowing padlock inside concentric security rings and circuit traces" }} label="Detailed spec / 02" title="Security is architecture">
         I design trust boundaries and protect application assets — from a PKI-authenticated mTLS channel to a
         medical device, to certificate-based signatures in a digital identity wallet.
       </PageIntro>

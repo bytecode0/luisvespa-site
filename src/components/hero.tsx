@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ChevronRight, GitBranch } from "lucide-react";
-import { AgentMesh } from "@/components/agent-mesh";
 import { Scramble } from "@/components/motion";
 import { TypeText } from "@/components/type-text";
 
@@ -20,7 +19,6 @@ export function Hero() {
 
   return (
     <section aria-labelledby="hero-title" className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden">
-      <AgentMesh className="[mask-image:radial-gradient(ellipse_at_center,rgba(0,0,0,0.25)_25%,black_75%),linear-gradient(to_bottom,black_70%,transparent)] [mask-composite:intersect]" />
       <div className="relative mx-auto w-full max-w-6xl px-5 pb-10 pt-16 text-center sm:px-8">
         <p className="inline-block rounded-sm border border-line bg-surface px-4 py-2 font-mono text-[10px] uppercase tracking-[0.3em] text-accent sm:text-xs">
           <TypeText text={LABEL} startMs={250} stepMs={TYPE_STEP} />

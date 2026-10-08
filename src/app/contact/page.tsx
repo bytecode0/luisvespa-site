@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <PageTransition>
-      <PageIntro variant="agents" typed label="Contact / 05" title="Get in touch.">
+      <PageIntro typed label="Contact / 05" title="Get in touch.">
         Android platforms, secure systems, developer tooling, agentic engineering — tell me what you&rsquo;re
         building. The form goes straight to my inbox; you don&rsquo;t need to leave this page.
       </PageIntro>

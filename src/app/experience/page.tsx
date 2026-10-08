@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default function ExperiencePage() {
   return (
     <PageTransition>
-      <PageIntro variant="quiet" typed label="Experience / 04" title="My experience.">
+      <PageIntro typed label="Experience / 04" title="My experience.">
         {summary.short} {siteConfig.location} · {summary.eligibility} · {summary.languages.join(" · ")}.
       </PageIntro>
 

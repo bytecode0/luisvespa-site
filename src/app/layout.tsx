@@ -8,6 +8,7 @@ import { ContactSection, SiteFooter } from "@/components/contact";
 import { viewModeBootScript } from "@/components/view-mode";
 import { InteractionLayer } from "@/components/interaction-layer";
 import { HideOn } from "@/components/hide-on";
+import { GlobalMesh } from "@/components/global-mesh";
 
 const plexSans = IBM_Plex_Sans({ variable: "--font-plex-sans", subsets: ["latin"], weight: ["300", "400", "500", "600"] });
 const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-dvh flex-col">
         <div className="dot-field" aria-hidden />
         <div className="dot-radar" aria-hidden />
+        <GlobalMesh />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}

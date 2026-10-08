@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function EngineeringPage() {
   return (
     <PageTransition>
-      <PageIntro variant="engineering" visual={{ src: "/visuals/engineering.jpg", alt: "Glowing Android robot outline between circuit traces" }} label="Detailed spec / 01" title="Engineering infrastructure">
+      <PageIntro visual={{ src: "/visuals/engineering.jpg", alt: "Glowing Android robot outline between circuit traces" }} label="Detailed spec / 01" title="Engineering infrastructure">
         I design Android apps and SDKs for regulated products, where a bug is a compliance problem and an API change
         breaks someone else&rsquo;s release.
       </PageIntro>

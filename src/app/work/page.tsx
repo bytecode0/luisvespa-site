@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function WorkPage() {
   return (
     <PageTransition>
-      <PageIntro variant="quiet" label="Work / 04" title="Selected work.">
+      <PageIntro label="Work / 04" title="Selected work.">
         Each case study follows the same structure: problem, constraints, architecture, decisions, implementation,
         security, result and lessons. Sections still to be written are marked.
       </PageIntro>
