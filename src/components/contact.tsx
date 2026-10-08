@@ -28,7 +28,7 @@ export function ContactSection(props: React.ComponentProps<"section">) {
       <Container className="relative">
         <div data-reveal>
           <p className="label mb-6">
-            <Scramble text="CONTACT / 08" trigger="view" />
+            <Scramble text="CONTACT / 05" trigger="view" />
           </p>
           <h2 id="contact-title" className="reveal-title max-w-3xl font-mono text-3xl font-bold text-ink sm:text-5xl">
             <span>LET&rsquo;S BUILD SOMETHING DIFFICULT.</span>

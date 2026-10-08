@@ -1,22 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import { type CaseStudy, principles, summary } from "@/content/profile";
-import { Panel, Placeholder, Tag, stagger } from "@/components/ui";
-
-export function EngineeringPrinciples() {
-  return (
-    <ol className="grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
-      {principles.map((p, i) => (
-        <li key={p.n} className="spotlight bg-bg p-6 sm:p-8" {...stagger(i, 80)}>
-          <p className="font-mono text-xs text-faint">{p.n}</p>
-          <h3 className="mt-4 text-lg font-semibold tracking-tight text-ink">{p.title}</h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{p.body}</p>
-        </li>
-      ))}
-    </ol>
-  );
-}
+import { type CaseStudy, summary } from "@/content/profile";
+import { Panel, Placeholder, Tag } from "@/components/ui";
 
 export function CaseStudyCard({ study, expanded = false }: { study: CaseStudy; expanded?: boolean }) {
   const sections = expanded ? study.sections : study.sections.filter((s) => s.body);

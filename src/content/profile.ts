@@ -356,15 +356,6 @@ export const agentBoundaries = [
   { name: "Evaluations", detail: "Tests on emulators and real devices decide, not the agent's own claims." },
 ] as const;
 
-export const principles = [
-  { n: "01", title: "Security is architecture", body: "Security is not a final checklist. It defines identity, trust boundaries and system design." },
-  { n: "02", title: "Automation should create leverage", body: "Agents should remove repetitive engineering work while preserving human judgment." },
-  { n: "03", title: "Every agent needs boundaries", body: "Tools, permissions, context and execution must be explicitly constrained." },
-  { n: "04", title: "Ship with evidence", body: "Tests, traces and production behaviour matter more than claims." },
-  { n: "05", title: "Humans own the system", body: "AI can accelerate engineering. Accountability remains human." },
-  { n: "06", title: "Defense in depth", body: "mTLS, authentication, secure storage, obfuscation and hardening each solve a different part of the problem." },
-] as const;
-
 export type CaseStudy = {
   id: string;
   title: string;

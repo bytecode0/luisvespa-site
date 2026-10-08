@@ -21,7 +21,6 @@ const items: Item[] = [
   { label: "MCP", hint: "AI / Agents", href: "/agents#mcp", keywords: "model context protocol jira figma gitlab" },
   { label: "Agent boundaries", hint: "AI / Agents", href: "/agents#boundaries", keywords: "safety permissions" },
   { label: "Agent trace demo", hint: "AI / Agents", href: "/agents#trace", keywords: "simulated" },
-  { label: "Engineering principles", hint: "Home", href: "/#principles", keywords: "manifesto" },
   { label: "Selected work", hint: "Case studies", href: "/work", keywords: "projects case studies" },
   { label: "Ask Luis", hint: "Experience", href: "/experience#ask", keywords: "questions assistant about" },
   { label: "Experience", hint: "Profile", href: "/experience", keywords: "about career timeline cv profile" },
