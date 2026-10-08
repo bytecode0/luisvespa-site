@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { roles, summary } from "@/content/profile";
+import { appForRole, roles, summary } from "@/content/profile";
+import { AppThumb } from "@/components/apps";
 import { Portrait } from "@/components/portrait";
 import { Spine } from "@/components/motion";
 import { TypeText } from "@/components/type-text";
@@ -128,6 +129,16 @@ export function ExperienceProfile() {
                           </li>
                         ))}
                       </ul>
+                      {appForRole(r.company) ? (
+                        <div className="mt-6 flex items-end gap-4">
+                          <AppThumb app={appForRole(r.company)!} />
+                          <p className="pb-1 font-mono text-[9px] uppercase tracking-[0.12em] text-faint">
+                            {appForRole(r.company)!.name}
+                            <br />
+                            Tap to view screens
+                          </p>
+                        </div>
+                      ) : null}
                     </li>
                   );
                 })}

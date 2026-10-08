@@ -1,350 +1,253 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
-import { ArrowRight, Bot, ChevronRight, Cpu, ShieldCheck, User } from "lucide-react";
-import { pipeline, roles } from "@/content/profile";
+import { ArrowRight, Bot, Cpu, MapPin, ShieldCheck } from "lucide-react";
+import { apps, appForRole, roles } from "@/content/profile";
 import { Scramble, Spine } from "@/components/motion";
-import { sequence, stagger } from "@/components/ui";
+import { stagger } from "@/components/ui";
+import { KeyVisual } from "@/components/key-visual";
+import { AppThumb, ShippedAppsStrip } from "@/components/apps";
+import { Portrait } from "@/components/portrait";
 import { AgentTrace } from "@/components/agent-trace";
 
 /* ---------- Building blocks ---------- */
 
-function ModuleLabel({ children }: { children: string }) {
+/** Node on the spine at the top edge of a section; lights up and pings when the section is in view. */
+function TopNode() {
   return (
-    <span className="font-mono text-[10px] tracking-[0.1em] text-accent">
-      [ <Scramble text={children} trigger="view" durationMs={700} /> ]
-    </span>
+    <span
+      aria-hidden
+      className="spine-node absolute left-1/2 top-0 z-20 block size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-accent bg-bg"
+    />
   );
 }
 
-/** A title that rises from behind a mask when its section is revealed. */
-function RevealTitle({ id, children, className = "" }: { id?: string; children: string; className?: string }) {
-  return (
-    <h2 id={id} className={`reveal-title font-mono text-ink ${className}`}>
-      <span>{children}</span>
-    </h2>
-  );
-}
-
-/** Glass card: border light on hover, slight 3D tilt towards the cursor. */
-function TechCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`tech-card spotlight tilt group p-7 sm:p-8 ${className}`}>{children}</div>;
-}
-
-function OpenModule({ href, children }: { href: string; children: ReactNode }) {
+function ModuleLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link
       href={href}
-      className="group/link mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-accent hover:text-ink"
+      className="group/link inline-flex items-center gap-4 font-mono text-xs uppercase tracking-[0.3em] text-accent transition-colors hover:text-accent-bright"
     >
-      {children}
-      <ArrowRight className="size-3.5 transition-transform group-hover/link:translate-x-1" aria-hidden />
+      [ {children} ] <ArrowRight className="size-4 transition-transform group-hover/link:translate-x-2" aria-hidden />
     </Link>
   );
 }
 
-const iconMotion = "transition-transform duration-500 group-hover:rotate-12 group-hover:scale-125";
-
-/** A node on the spine. Lights up and pings when its module is in view. */
-function SpineNode() {
-  return (
-    <div
-      aria-hidden
-      className="spine-node absolute left-1/2 top-1/2 z-20 hidden size-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-line-strong bg-bg lg:flex"
-    >
-      <span className="size-2 rounded-full bg-accent" />
-    </div>
-  );
-}
-
-/**
- * Below lg the blocks stack and the spine runs down the centre behind them (it shows in the gaps).
- * This node sits in the gap between two stacked blocks, on the spine.
- */
-function GapNode() {
-  return (
-    <div aria-hidden className="relative flex h-14 items-center justify-center lg:hidden">
-      <div className="spine-node relative z-20 flex size-6 items-center justify-center rounded-full border-2 border-line-strong bg-bg">
-        <span className="size-1.5 rounded-full bg-accent" />
-      </div>
-    </div>
-  );
-}
-
-/** Two columns around the spine. Each side enters from its own edge; connectors draw out from the node. */
-function SpineModule({
-  id,
-  label,
-  card,
-  aside,
-  reverse = false,
-  sfx = "blip",
-}: {
+type ModuleProps = {
   id: string;
-  label: string;
-  card: ReactNode;
-  aside: ReactNode;
-  reverse?: boolean;
+  n: string;
+  visual: { src: string; alt: string; label: string };
+  moduleLabel: string;
+  icon: ReactNode;
+  cardTitle: string;
+  cardText: string;
+  bullets: string[];
+  title: [string, string];
+  text: string;
+  link: { href: string; label: string };
+  visualSide: "left" | "right";
   sfx?: "blip" | "chord";
-}) {
-  const cardSide = reverse ? "enter-right" : "enter-left";
-  const asideSide = reverse ? "enter-left" : "enter-right";
+};
+
+/** Control Plane module: a glass card with the category key visual on one side, the statement on the other. */
+function VisualModule(m: ModuleProps) {
+  const cardLeft = m.visualSide === "left";
   return (
-    <section id={id} aria-label={label} data-reveal data-sfx={sfx} className="relative z-10 py-16 lg:py-32">
-      <span aria-hidden className="connector to-left hidden lg:block" />
-      <span aria-hidden className="connector to-right hidden lg:block" />
-      <div className={`items-center justify-between gap-16 lg:flex ${reverse ? "lg:flex-row-reverse" : ""}`}>
-        <div className={`lg:w-[45%] ${cardSide}`}>{card}</div>
-        <GapNode />
-        <SpineNode />
-        <div className={`lg:w-[45%] ${asideSide}`} style={{ "--d": "180ms" } as CSSProperties}>
-          {aside}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- Modules ---------- */
-
-const stackLines: { text: string; accent?: boolean; indent?: number }[] = [
-  { text: "$ tree android_stack" },
-  { text: "ANDROID_STACK", accent: true },
-  { text: "├── SECURITY", indent: 1 },
-  { text: "├── mTLS / PKI", indent: 2 },
-  { text: "├── Keystore", indent: 2 },
-  { text: "└── DexGuard / R8", indent: 2 },
-  { text: "└── PLATFORM", indent: 1 },
-  { text: "├── SDK core", indent: 2 },
-  { text: "└── Compose UI", indent: 2 },
-  { text: "AGENTIC_LAYER (MCP)", accent: true },
-  { text: ">> Jira · Figma · GitLab" },
-];
-
-function EngineeringModule() {
-  const items = ["Multi-layered modular architecture", "SDK development and lifecycles (Android + iOS)", "Performance profiling and optimization"];
-  return (
-    <SpineModule
-      id="engineering"
-      label="Engineering"
-      card={
-        <TechCard>
-          <div className="mb-6 flex items-start justify-between">
-            <ModuleLabel>MODULE: SYS_ARCH</ModuleLabel>
-            <Cpu className={`size-4 text-accent/60 group-hover:text-accent ${iconMotion}`} aria-hidden />
-          </div>
-          <RevealTitle className="text-2xl">SYSTEM ARCHITECTURE</RevealTitle>
-          <p className="mt-4 text-sm leading-relaxed text-muted">
-            Resilient, modular Android apps and SDKs for regulated products — from secure storage and networking to
-            Compose UI.
-          </p>
-          <ul className="mt-6 space-y-2.5 font-mono text-[11px] text-muted">
-            {items.map((item, i) => (
-              <li key={item} className="flex items-center gap-2" {...stagger(i + 2, 110)}>
-                <ChevronRight className="size-3 text-accent" aria-hidden /> {item}
-              </li>
-            ))}
-          </ul>
-          <OpenModule href="/engineering">Open module</OpenModule>
-        </TechCard>
-      }
-      aside={
-        <div>
-          <p className="label mb-4">Visualizing the stack</p>
-          <div className="relative overflow-hidden border border-line bg-surface-2 p-6 font-mono text-[12px] leading-relaxed text-ink/80">
-            <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_70%)]" />
-            <div className="relative" aria-label="Android stack: security (mTLS / PKI, Keystore, DexGuard / R8), platform (SDK core, Compose UI), agentic layer over MCP (Jira, Figma, GitLab)">
-              {stackLines.map((l, i) => (
-                <p
-                  key={l.text}
-                  aria-hidden
-                  className={`term-line ${l.accent ? "text-accent" : i === 0 ? "text-faint" : ""} ${i === stackLines.length - 1 ? "text-[10px] text-muted" : ""}`}
-                  style={{ "--d": `${500 + i * 110}ms`, paddingLeft: `${(l.indent ?? 0) * 1}rem` } as CSSProperties}
-                >
-                  {l.text}
-                  {i === stackLines.length - 1 ? <span className="caret" /> : null}
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
-      }
-    />
-  );
-}
-
-const securitySteps = [
-  { code: "01_IDENTITY", name: "PKI / mTLS", detail: "Mutual trust between client and server, proven with certificates." },
-  { code: "02_STORAGE", name: "ANDROID KEYSTORE", detail: "Hardware-backed protection for keys that never leave the device." },
-  { code: "03_CODE", name: "DEXGUARD / R8", detail: "Obfuscation and hardening that raise the cost of reverse engineering." },
-  { code: "04_RELEASE", name: "SIGNED RELEASE", detail: "Cryptographically verified production builds." },
-];
-
-function SecurityModule() {
-  return (
-    <section id="security" aria-labelledby="security-title" data-reveal data-sfx="blip" className="relative z-10 py-16 lg:py-32">
-      <div className="relative mx-auto mb-14 max-w-md bg-bg py-2 text-center">
-        <ShieldCheck className="mx-auto mb-4 size-5 text-accent" aria-hidden />
-        <RevealTitle id="security-title" className="text-3xl">
-          SECURITY PIPELINE
-        </RevealTitle>
-        <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
-          <Scramble text="DEFENSE IN DEPTH FOR ANDROID" trigger="view" delayMs={300} />
-        </p>
-      </div>
-
-      <div className="-mt-6 mb-2">
-        <GapNode />
-      </div>
-
-      {/* The bus: a packet crosses the four stages; each stage lights up as it passes. */}
-      <div aria-hidden className="relative mb-4 hidden h-px bg-line lg:block">
-        <span className="bus-packet" />
-      </div>
-      <ol className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {securitySteps.map((s, i) => {
-          const seq = sequence(i, securitySteps.length);
-          return (
-            <li key={s.code} {...stagger(i, 110)}>
-              <div
-                style={seq.style}
-                className={`${seq.className} tech-card spotlight tilt group h-full p-6 ${i === 3 ? "border-accent/60" : ""}`}
-              >
-                <p className="font-mono text-[10px] text-accent">{s.code}</p>
-                <h3 className="mt-2 font-mono text-sm text-ink">{s.name}</h3>
-                <p className="mt-3 text-xs leading-relaxed text-muted transition-colors group-hover:text-ink">{s.detail}</p>
+    <section id={m.id} aria-labelledby={`${m.id}-title`} data-reveal data-sfx={m.sfx ?? "blip"} className="relative z-10 py-24 lg:py-40">
+      <TopNode />
+      <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-24">
+        {/* The card */}
+        <div className={`relative order-2 ${cardLeft ? "enter-left lg:order-1" : "enter-right lg:order-2"}`}>
+          <div className="glass-cv tech-card spotlight group relative p-4">
+            <KeyVisual {...m.visual} className="mb-8" />
+            <div className="px-4 pb-4">
+              <div className="mb-6 flex items-start justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                  [ <Scramble text={m.moduleLabel} trigger="view" durationMs={700} /> ]
+                </span>
+                <span className="text-line-strong transition-colors group-hover:text-accent">{m.icon}</span>
               </div>
-            </li>
-          );
-        })}
-      </ol>
-      <p className="mx-auto mt-8 max-w-2xl bg-bg py-1 text-center text-sm text-muted">
-        In production: a PKI and mTLS channel to a medical device (Ypsomed), and X.509 signatures with DexGuard
-        hardening for digital identity (Digidentity).
-      </p>
-      <div className="text-center">
-        <OpenModule href="/security">Open module</OpenModule>
+              <h3 className="mb-6 font-mono text-2xl font-bold uppercase tracking-tight text-ink sm:text-3xl">{m.cardTitle}</h3>
+              <p className="mb-8 text-sm leading-relaxed text-muted">{m.cardText}</p>
+              <ul className="grid grid-cols-1 gap-4 font-mono text-[10px] uppercase tracking-[0.14em] text-faint sm:grid-cols-2">
+                {m.bullets.map((b, i) => (
+                  <li key={b} className="flex items-center gap-2" {...stagger(i + 2, 90)}>
+                    <span aria-hidden className="size-1 bg-accent" /> {b}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {/* The statement (opaque on mobile so the spine passes behind it) */}
+        <div
+          className={`relative order-1 space-y-8 bg-bg py-2 lg:bg-transparent ${cardLeft ? "enter-right lg:order-2" : "enter-left lg:order-1"}`}
+          style={{ "--d": "150ms" } as CSSProperties}
+        >
+          <p className="font-mono text-[11px] uppercase tracking-[0.5em] text-muted">SYSTEM / {m.n}</p>
+          <h2 id={`${m.id}-title`} className="reveal-title font-mono text-4xl font-bold uppercase leading-[1.05] tracking-tighter text-ink lg:text-6xl">
+            <span>
+              {m.title[0]}
+              <br />
+              {m.title[1]}
+            </span>
+          </h2>
+          <p className="max-w-md text-lg text-muted">{m.text}</p>
+          <div className="pt-4">
+            <ModuleLink href={m.link.href}>{m.link.label}</ModuleLink>
+          </div>
+        </div>
       </div>
     </section>
-  );
-}
-
-function AgentsModule() {
-  return (
-    <SpineModule
-      id="agents"
-      label="AI agents"
-      reverse
-      sfx="chord"
-      card={
-        <TechCard className="border-accent/50">
-          <div className="mb-6 flex items-start justify-between">
-            <ModuleLabel>MODULE: AGENT_ORCH</ModuleLabel>
-            <Bot className={`size-4 text-accent ${iconMotion}`} aria-hidden />
-          </div>
-          <RevealTitle className="text-2xl">AGENTIC SDLC</RevealTitle>
-          <p className="mt-4 text-sm leading-relaxed text-muted">
-            The pipeline I designed and run at Digidentity: a Jira ticket goes in, a reviewed merge request comes out.
-            Tested on emulators and physical devices.
-          </p>
-          <div className="mt-6 space-y-3">
-            <div className="border border-line bg-bg/50 p-3 transition-colors hover:border-accent/60" {...stagger(2)}>
-              <p className="font-mono text-[10px] italic text-ink/60">Agents: Claude Code</p>
-              <p className="mt-1 text-[11px] text-muted">Connected to Jira, Figma and GitLab through MCP servers.</p>
-            </div>
-            <div className="border border-human/30 bg-human-soft p-3 transition-colors hover:border-human/70" {...stagger(3)}>
-              <p className="font-mono text-[10px] italic text-human">Human gates: 2</p>
-              <p className="mt-1 text-[11px] text-muted">Engineers approve the plan before coding and the merge before it lands.</p>
-            </div>
-          </div>
-          <OpenModule href="/agents">Open module</OpenModule>
-        </TechCard>
-      }
-      aside={
-        <div className="border border-line bg-surface-2 p-6 sm:p-8">
-          <ol className="flex flex-col items-center gap-2 text-center font-mono text-[11px]">
-            <li className="text-ink/40">JIRA TICKET</li>
-            {pipeline.map((stage, i) => {
-              const human = stage.actor === "human";
-              const seq = sequence(i, pipeline.length, human ? "var(--human)" : undefined, 0.9);
-              return (
-                <li key={stage.id} className="flex w-full flex-col items-center gap-2" {...stagger(i, 90)}>
-                  <span aria-hidden className="flow-line" style={{ height: "1rem", "--d": `${i * 300}ms` } as CSSProperties} />
-                  <span
-                    style={seq.style}
-                    className={`${seq.className} inline-flex items-center gap-2 border px-4 py-2 ${
-                      human ? "border-human/50 text-human" : "border-line text-ink"
-                    }`}
-                  >
-                    {human ? <User className="size-3" aria-hidden /> : <Bot className="size-3 text-accent" aria-hidden />}
-                    {stage.name.toUpperCase()}
-                  </span>
-                </li>
-              );
-            })}
-            <li className="flex flex-col items-center gap-2">
-              <span aria-hidden className="flow-line" style={{ height: "1rem" }} />
-              <span className="font-bold text-ink/50">MERGE REQUEST</span>
-            </li>
-          </ol>
-        </div>
-      }
-    />
   );
 }
 
 /* ---------- The control plane ---------- */
 
-/** Home: modules hanging off a vertical spine that fills as you read. */
+/** Home: modules hanging off the central spine, the shipped-apps strip, then the experience log. */
 export function ControlPlane() {
   return (
-    <div className="relative mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-      {/* The spine runs down the centre at every size: between columns on desktop, behind stacked blocks below lg. */}
-      <Spine />
-      <EngineeringModule />
-      <SecurityModule />
-      <AgentsModule />
-      <div className="view-only-deep relative z-10 pb-16">
-        <AgentTrace />
+    <>
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <Spine />
+        <VisualModule
+          id="engineering"
+          n="01"
+          visual={{ src: "/visuals/engineering.jpg", alt: "Glowing Android robot outline between circuit traces", label: "SYSTEM / 01_CORE" }}
+          moduleLabel="MODULE: SYS_ARCH"
+          icon={<Cpu className="size-4" aria-hidden />}
+          cardTitle="ENGINEERING_STACK"
+          cardText="Android engineering for regulated products: modular apps and SDKs in Kotlin and Jetpack Compose, built with TDD, XP practices and CI/CD."
+          bullets={["SDK_DEVELOPMENT", "MODULAR_SYSTEMS", "CI_CD_PIPELINES", "PERFORMANCE_PROFILING"]}
+          title={["Architectural", "Integrity"]}
+          text="Foundations that hold up in regulated products — from Android and iOS SDK lifecycles to Compose UI and performance profiling."
+          link={{ href: "/engineering", label: "DETAILED_SPECS" }}
+          visualSide="left"
+        />
       </div>
-    </div>
+
+      {/* SHIPPED_APPS: real public apps from companies I worked at */}
+      <section aria-labelledby="shipped-title" data-reveal className="relative overflow-hidden border-y border-line bg-surface py-24">
+        <div aria-hidden className="grid-bg absolute inset-0 opacity-30" />
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="mb-16 flex items-center justify-between gap-6">
+            <h2 id="shipped-title" className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
+              <Scramble text="SHIPPED_PRODUCTION_APPS" trigger="view" />
+            </h2>
+            <span aria-hidden className="h-px flex-1 bg-line" />
+            <span className="font-mono text-[10px] uppercase text-muted">Public on Google Play</span>
+          </div>
+          <ShippedAppsStrip apps={apps} />
+        </div>
+      </section>
+
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <Spine />
+        <VisualModule
+          id="security"
+          n="02"
+          visual={{ src: "/visuals/security.jpg", alt: "Glowing padlock inside concentric security rings and circuit traces", label: "SYSTEM / 02_SECURITY" }}
+          moduleLabel="MODULE: HARDENING"
+          icon={<ShieldCheck className="size-4" aria-hidden />}
+          cardTitle="SECURITY_ENGINEERING"
+          cardText="PKI and certificate-based mTLS for a medical device channel (Ypsomed); X.509 signatures, passwordless login and DexGuard hardening for digital identity (Digidentity)."
+          bullets={["PKI_X509", "mTLS_CHANNELS", "DEXGUARD_R8", "ANDROID_KEYSTORE"]}
+          title={["Defense in", "Depth"]}
+          text="Hardening Android apps against reverse engineering, and building trust with certificates, mTLS, pinning and the Android Keystore."
+          link={{ href: "/security", label: "SECURITY_PROTOCOLS" }}
+          visualSide="right"
+        />
+        <VisualModule
+          id="agents"
+          n="03"
+          visual={{ src: "/visuals/agents.jpg", alt: "Network of glowing interconnected nodes", label: "SYSTEM / 03_AGENTS" }}
+          moduleLabel="MODULE: AGENTIC_SDLC"
+          icon={<Bot className="size-4" aria-hidden />}
+          cardTitle="AGENT_ORCHESTRATION"
+          cardText="Claude Code agents connected to Jira, Figma and GitLab through MCP: they refine, develop, test on emulators and physical devices, and review — with two human approval gates."
+          bullets={["MCP_SERVERS", "AGENTIC_SDLC", "ON_DEVICE_TESTING", "HUMAN_GATES"]}
+          title={["Intelligent", "Automation"]}
+          text="A pipeline that takes a Jira ticket to a reviewed merge request, with engineers approving the plan and the merge."
+          link={{ href: "/agents", label: "AGENT_CAPABILITIES" }}
+          visualSide="left"
+          sfx="chord"
+        />
+        <div className="view-only-deep relative z-10 pb-16">
+          <AgentTrace />
+        </div>
+      </div>
+    </>
   );
 }
+
+/* ---------- Experience on the home page ---------- */
+
+const token = (t: string) => t.toUpperCase().replace(/[^A-Z0-9+]+/g, "_").replace(/^_|_$/g, "");
 
 export function ExperienceLog() {
   const recent = roles.slice(0, 4);
   return (
-    <section id="experience" aria-labelledby="experience-title" className="border-t border-line bg-surface py-24 sm:py-32">
-      <div className="mx-auto max-w-4xl px-5 sm:px-8">
-        <div data-reveal className="mb-14 flex items-center gap-4">
-          <RevealTitle id="experience-title" className="text-3xl">
-            EXPERIENCE_LOG
-          </RevealTitle>
-          <div className="h-px flex-1 origin-left bg-line" />
+    <section id="experience" aria-labelledby="experience-title" className="relative border-t border-line py-24 lg:py-40">
+      <TopNode />
+      <div className="mx-auto max-w-7xl px-5 sm:px-8">
+        <div data-reveal className="mb-20 text-center">
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.4em] text-accent">
+            <Scramble text="EXPERIENCE_LOG / 04" trigger="view" />
+          </p>
+          <h2 id="experience-title" className="reveal-title font-mono text-4xl font-bold uppercase tracking-tighter text-ink lg:text-6xl">
+            <span>Track Record</span>
+          </h2>
         </div>
-        {/* The timeline line fills with the reader's progress, like the spine. */}
-        <ol data-reveal className="relative space-y-12">
-          <Spine className="spine-left" />
-          {recent.map((r, i) => (
-            <li key={r.company} className="from-left relative pl-8" {...stagger(i, 140)}>
-              <span
-                aria-hidden
-                className={`ping-once absolute -left-1 top-0.5 size-[9px] rounded-full ${i === 0 ? "bg-accent" : "bg-line-strong"}`}
-                style={{ "--d": `${i * 140}ms` } as CSSProperties}
-              />
-              <p className={`font-mono text-xs ${i === 0 ? "text-accent" : "text-faint"}`}>{r.period.toUpperCase()}</p>
-              <h3 className="mt-1 text-xl font-semibold text-ink">
-                {r.title.toUpperCase()} <span className="font-normal text-muted">· {r.company}</span>
-              </h3>
-              <ul className="mt-2 space-y-1 text-sm leading-relaxed text-muted">
-                {r.points.slice(0, 2).map((p) => (
-                  <li key={p}>{p}</li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
-        <div data-reveal>
-          <OpenModule href="/experience#experience">Full experience</OpenModule>
+
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
+          {/* Sticky portrait */}
+          <div className="lg:col-span-4">
+            <div data-reveal className="space-y-6 lg:sticky lg:top-28">
+              <div className="mx-auto max-w-[320px] lg:max-w-none">
+                <Portrait variant="inset" />
+              </div>
+              <div>
+                <h3 className="font-mono text-2xl font-bold uppercase tracking-tight text-ink">Luis Vespa</h3>
+                <p className="mt-1 font-mono text-xs uppercase tracking-[0.14em] text-muted">Senior Android Engineer</p>
+                <p className="mt-4 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
+                  <MapPin className="size-3 text-accent" aria-hidden /> Madrid // EU
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Glass role cards */}
+          <ol className="space-y-8 lg:col-span-8">
+            {recent.map((r, i) => {
+              const app = appForRole(r.company);
+              return (
+                <li key={r.company} data-reveal style={{ "--d": `${i * 90}ms` } as CSSProperties}>
+                  <article className="glass-cv tech-card spotlight group p-6 sm:p-8">
+                    <div className="flex flex-col items-start gap-8 md:flex-row">
+                      <div className="flex-1 space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <h3 className="font-mono text-lg font-bold uppercase text-ink sm:text-xl">{r.title}</h3>
+                          <span className={`px-2 py-1 font-mono text-[10px] uppercase tracking-[0.14em] ${i === 0 ? "bg-accent/10 text-accent" : "text-faint"}`}>
+                            {r.period}
+                          </span>
+                        </div>
+                        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-faint">[ {r.company} ]</p>
+                        <p className="text-sm leading-relaxed text-muted">{r.points[0]}</p>
+                        <ul className="space-y-2 font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
+                          {r.tags.slice(0, 4).map((t) => (
+                            <li key={t}>— {token(t)}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      {app ? <AppThumb app={app} /> : null}
+                    </div>
+                  </article>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+        <div data-reveal className="mt-14 text-center">
+          <ModuleLink href="/experience">FULL_EXPERIENCE</ModuleLink>
         </div>
       </div>
     </section>

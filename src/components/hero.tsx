@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { ArrowRight, FileText } from "lucide-react";
-import { siteConfig } from "@/config/site";
+import { ChevronRight, GitBranch } from "lucide-react";
 import { AgentMesh } from "@/components/agent-mesh";
 import { Scramble } from "@/components/motion";
 import { TypeText } from "@/components/type-text";
@@ -9,7 +8,7 @@ import { TypeText } from "@/components/type-text";
 /** Plain-text, monochrome company names: recognisable without using anyone's trademarks. */
 const companies = ["Digidentity", "Ypsomed (via InnoIT)", "Vodafone", "Unisys", "EVO Banco", "Wallbox"];
 
-const LABEL = "SENIOR ANDROID ENGINEER // SECURITY & SDKs // AI AGENTS";
+const LABEL = "SYSTEM_INITIALIZED // SENIOR_ANDROID_ENGINEER";
 const TYPE_STEP = 18;
 const LINES_START = 250 + LABEL.length * TYPE_STEP * 0.5;
 const LINE_STEP = 140;
@@ -20,16 +19,16 @@ export function Hero() {
   const after = LINES_START + 4 * LINE_STEP;
 
   return (
-    <section aria-labelledby="hero-title" className="relative overflow-hidden">
+    <section aria-labelledby="hero-title" className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden">
       <AgentMesh className="[mask-image:radial-gradient(ellipse_at_center,rgba(0,0,0,0.25)_25%,black_75%),linear-gradient(to_bottom,black_70%,transparent)] [mask-composite:intersect]" />
-      <div className="relative mx-auto max-w-5xl px-5 pb-10 pt-20 text-center sm:px-8 sm:pt-28 lg:pt-32">
-        <p className="inline-block border-b border-accent pb-1 font-mono text-[10px] tracking-[0.2em] text-accent sm:text-xs">
+      <div className="relative mx-auto w-full max-w-6xl px-5 pb-10 pt-16 text-center sm:px-8">
+        <p className="inline-block rounded-sm border border-line bg-surface px-4 py-2 font-mono text-[10px] uppercase tracking-[0.3em] text-accent sm:text-xs">
           <TypeText text={LABEL} startMs={250} stepMs={TYPE_STEP} />
         </p>
 
         <h1
           id="hero-title"
-          className="mt-8 font-mono text-[1.9rem] font-bold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-7xl"
+          className="mt-10 font-mono text-[1.9rem] font-bold uppercase leading-none tracking-tighter text-ink sm:text-6xl lg:text-8xl"
         >
           <span className="line-mask">
             <span style={line(0)}>I BUILD SECURE</span>
@@ -48,32 +47,23 @@ export function Hero() {
           </span>
         </h1>
 
-        <p
-          className="block-in mx-auto mt-8 max-w-2xl text-base leading-relaxed text-muted sm:text-lg"
-          style={{ "--d": `${after}ms` } as CSSProperties}
-        >
-          High-stakes Android architecture, application hardening and an end-to-end agentic SDLC — with engineers
-          approving every plan and every merge.
-        </p>
-
         <div
-          className="block-in mt-10 flex flex-wrap justify-center gap-4"
+          className="block-in mt-12 flex flex-wrap justify-center gap-4 sm:gap-8"
           style={{ "--d": `${after + 150}ms` } as CSSProperties}
         >
           <Link
             href="/engineering"
-            className="group inline-flex items-center gap-2 border border-ink bg-ink px-7 py-3.5 font-mono text-xs font-bold uppercase tracking-[0.08em] text-bg transition-colors hover:border-accent hover:bg-accent hover:text-white"
+            className="group inline-flex items-center gap-4 rounded-sm border border-ink bg-ink px-8 py-4 font-mono text-sm font-bold uppercase tracking-[0.14em] text-bg transition-colors hover:border-accent hover:bg-accent hover:text-white sm:px-10 sm:py-5"
           >
             Explore engineering
-            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+            <ChevronRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden />
           </Link>
-          <a
-            href={siteConfig.cvPath}
-            download
-            className="inline-flex items-center gap-2 border border-line bg-surface-2 px-7 py-3.5 font-mono text-xs uppercase tracking-[0.08em] text-ink transition-colors hover:border-accent"
+          <Link
+            href="/experience"
+            className="inline-flex items-center gap-3 rounded-sm border border-line bg-surface px-8 py-4 font-mono text-sm uppercase tracking-[0.14em] text-ink transition-colors hover:border-accent sm:px-10 sm:py-5"
           >
-            <FileText className="size-4 text-accent" aria-hidden /> Download CV
-          </a>
+            <GitBranch className="size-4 text-accent" aria-hidden /> View experience
+          </Link>
         </div>
 
         <div className="block-in mt-14" style={{ "--d": `${after + 300}ms` } as CSSProperties}>

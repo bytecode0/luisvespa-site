@@ -91,6 +91,78 @@ export const roles: Role[] = [
   },
 ];
 
+/**
+ * Public apps from companies Luis worked at. Images are taken from the public Google Play listings
+ * (promotional screenshots, credited to their owners). `role` must match a `roles[].company`.
+ */
+export type ShippedApp = {
+  slug: string;
+  name: string;
+  company: string;
+  role: string;
+  period: string;
+  domain: string;
+  storeUrl: string;
+  /** What Luis did, phrased from the verified role facts only. */
+  contribution: string;
+  /** Shown under the gallery; honest about current listings vs. his time there. */
+  credit: string;
+  screens: { src: string; alt: string }[];
+};
+
+export const apps: ShippedApp[] = [
+  {
+    slug: "digidentity",
+    name: "Digidentity Wallet",
+    company: "Digidentity",
+    role: "Digidentity",
+    period: "2025 – Present",
+    domain: "Digital identity",
+    storeUrl: "https://play.google.com/store/apps/details?id=com.digidentity",
+    contribution: "Android engineer on the identity wallet and its SDK: identity verification, onboarding, passwordless login, X.509 digital signatures and DexGuard hardening.",
+    credit: "Screens from the public Google Play listing · © Digidentity",
+    screens: [
+      { src: "/apps/digidentity/1.webp", alt: "Digidentity Wallet: secure log in screen" },
+      { src: "/apps/digidentity/2.webp", alt: "Digidentity Wallet: proving your identity with a passport scan" },
+      { src: "/apps/digidentity/3.webp", alt: "Digidentity Wallet: signing a document with a qualified e-signature" },
+    ],
+  },
+  {
+    slug: "ypsopump",
+    name: "YpsoPump Explorer",
+    company: "Ypsomed (via InnoIT)",
+    role: "InnoIT — Ypsomed project",
+    period: "2022 – 2024",
+    domain: "Medtech",
+    storeUrl: "https://play.google.com/store/apps/details?id=com.ypsomed.ypu.demo",
+    contribution: "Lead Android engineer on the Ypsomed project: Android and iOS SDKs for the YpsoPump insulin pump, with a PKI / certificate-based mTLS channel to the device.",
+    credit: "Screens from the current public Google Play listing · © Ypsomed",
+    screens: [
+      { src: "/apps/ypsopump/1.webp", alt: "YpsoPump Explorer: 3D pump simulator" },
+      { src: "/apps/ypsopump/2.webp", alt: "YpsoPump Explorer: guided tours of the pump" },
+      { src: "/apps/ypsopump/3.webp", alt: "YpsoPump Explorer: overview of the pump icons" },
+    ],
+  },
+  {
+    slug: "mivodafone",
+    name: "Mi Vodafone",
+    company: "Vodafone",
+    role: "Vodafone",
+    period: "2019 – 2022",
+    domain: "Telecom e-commerce",
+    storeUrl: "https://play.google.com/store/apps/details?id=es.vodafone.mobile.mivodafone",
+    contribution: "Android engineer building core features of Vodafone's e-commerce app, improving UX and stability.",
+    credit: "Current public Google Play listing (the app has evolved since 2022) · © Vodafone",
+    screens: [
+      { src: "/apps/mivodafone/1.webp", alt: "Mi Vodafone: home screen" },
+      { src: "/apps/mivodafone/2.webp", alt: "Mi Vodafone: bills overview" },
+      { src: "/apps/mivodafone/3.webp", alt: "Mi Vodafone: managing your products" },
+    ],
+  },
+];
+
+export const appForRole = (company: string) => apps.find((a) => a.role === company);
+
 /** Engineering domains. `evidence` names where the work was done. */
 export const domains = [
   {

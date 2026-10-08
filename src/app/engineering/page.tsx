@@ -4,7 +4,8 @@ import { PageTransition } from "@/components/page-transition";
 import { Section, Tag } from "@/components/ui";
 import { AndroidLayers } from "@/components/android-layers";
 import { SdkLab } from "@/components/sdk-lab";
-import { androidStack } from "@/content/profile";
+import { androidStack, apps } from "@/content/profile";
+import { AppShowcase } from "@/components/apps";
 
 export const metadata: Metadata = {
   title: "Android & SDK Engineering",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 export default function EngineeringPage() {
   return (
     <PageTransition>
-      <PageIntro variant="engineering" label="Engineering / 01" title="Android platforms built to last.">
+      <PageIntro visual={{ src: "/visuals/engineering.jpg", alt: "Glowing Android robot outline between circuit traces" }} label="Detailed spec / 01" title="Engineering infrastructure">
         I design Android apps and SDKs for regulated products, where a bug is a compliance problem and an API change
         breaks someone else&rsquo;s release.
       </PageIntro>
@@ -43,6 +44,19 @@ export default function EngineeringPage() {
         intro="SDKs are products, not reusable folders. Their users are other engineers, and their contract is the public API."
       >
         <SdkLab />
+      </Section>
+
+      <Section
+        id="shipped-apps"
+        label="Shipped / 03"
+        title="Apps I worked on"
+        intro="Public Android apps from companies I worked at. Screens come from their current Google Play listings."
+      >
+        <div className="space-y-28">
+          {apps.map((app, i) => (
+            <AppShowcase key={app.slug} app={app} reverse={i % 2 === 1} />
+          ))}
+        </div>
       </Section>
     </PageTransition>
   );

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function AgentsPage() {
   return (
     <PageTransition>
-      <PageIntro variant="agents" label="Agents / 03" title="From developer tools to autonomous workflows.">
+      <PageIntro visual={{ src: "/visuals/agents.jpg", alt: "Network of glowing interconnected nodes" }} label="Detailed spec / 03" title="Intelligent automation">
         Not &ldquo;AI writes my code&rdquo;. An engineering system where agents refine, implement, test and review —
         and humans approve the plan and the merge.
       </PageIntro>
