@@ -56,6 +56,24 @@ function SpineNode() {
   );
 }
 
+/**
+ * Mobile/tablet version of the node: below lg the spine runs down the left gutter, so each module
+ * gets a small node on it plus a short connector that draws out to the card.
+ */
+function MobileSpineNode() {
+  return (
+    <>
+      <div
+        aria-hidden
+        className="spine-node absolute -left-[35px] top-[5.25rem] z-20 flex size-5 items-center justify-center rounded-full border-2 border-line-strong bg-bg lg:hidden"
+      >
+        <span className="size-1.5 rounded-full bg-accent" />
+      </div>
+      <span aria-hidden className="connector-mobile absolute -left-[15px] top-[calc(5.25rem+9.5px)] h-px w-[15px] lg:hidden" />
+    </>
+  );
+}
+
 /** Two columns around the spine. Each side enters from its own edge; connectors draw out from the node. */
 function SpineModule({
   id,
@@ -78,6 +96,7 @@ function SpineModule({
     <section id={id} aria-label={label} data-reveal data-sfx={sfx} className="relative z-10 py-16 lg:py-32">
       <span aria-hidden className="connector to-left hidden lg:block" />
       <span aria-hidden className="connector to-right hidden lg:block" />
+      <MobileSpineNode />
       <div className={`items-center justify-between gap-16 lg:flex ${reverse ? "lg:flex-row-reverse" : ""}`}>
         <div className={`mb-10 lg:mb-0 lg:w-[45%] ${cardSide}`}>{card}</div>
         <SpineNode />
@@ -167,6 +186,7 @@ const securitySteps = [
 function SecurityModule() {
   return (
     <section id="security" aria-labelledby="security-title" data-reveal data-sfx="blip" className="relative z-10 py-16 lg:py-32">
+      <MobileSpineNode />
       <div className="relative mx-auto mb-14 max-w-md bg-bg py-2 text-center">
         <ShieldCheck className="mx-auto mb-4 size-5 text-accent" aria-hidden />
         <RevealTitle id="security-title" className="text-3xl">
@@ -279,12 +299,15 @@ function AgentsModule() {
 export function ControlPlane() {
   return (
     <div className="relative mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-      <Spine className="hidden lg:block" />
+      {/* Below lg the modules leave a left gutter for the spine; from lg up it runs down the centre. */}
+      <div className="relative pl-9 lg:pl-0">
+      <Spine className="spine-responsive" />
       <EngineeringModule />
       <SecurityModule />
       <AgentsModule />
       <div className="view-only-deep relative z-10 pb-16">
         <AgentTrace />
+      </div>
       </div>
     </div>
   );
