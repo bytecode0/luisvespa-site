@@ -208,7 +208,7 @@ export function AppShowcase({ app, reverse = false }: { app: ShippedApp; reverse
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint">[ {app.company} ]</p>
           <h3 className="mt-2 font-mono text-3xl font-bold uppercase text-ink sm:text-4xl">{app.name}</h3>
           <p className="mt-2 font-mono text-xs uppercase italic tracking-[0.12em] text-accent">
-            Android app I worked on · {app.period}
+            {app.relation ?? "Android app I worked on"} · {app.period}
           </p>
         </div>
         <div className="flex items-start gap-4">

@@ -57,7 +57,7 @@ export function SdkLab() {
           ))}
         </ul>
         <p className="mt-5 text-sm leading-relaxed text-muted">
-          In practice: the Android and iOS SDKs for the Ypsomed medical self-injection device, and the Android
+          In practice: the Android and iOS SDKs for the Ypsomed YpsoPump insulin pump, as Android Tech Lead, and the Android
           identity SDK at Digidentity.
         </p>
       </Panel>

@@ -39,12 +39,12 @@ export const roles: Role[] = [
   },
   {
     company: "InnoIT — Ypsomed project",
-    title: "Lead Android Engineer",
+    title: "Android Tech Lead",
     period: "Jun 2022 – Dec 2024",
     domain: "Medtech",
     tags: ["PKI", "mTLS", "Android + iOS SDKs", "TDD", "CI/CD"],
     points: [
-      "Led the Android and iOS SDKs for an EU medical self-injection device.",
+      "Android Tech Lead for the SDKs (Android and iOS) of the YpsoPump insulin pump at Ypsomed.",
       "Encrypted communication channel between the Android device and the medical device, authenticated with PKI and certificate-based mTLS.",
       "High-reliability architecture with TDD, Coroutines, XP and CI/CD pipelines.",
     ],
@@ -103,6 +103,8 @@ export type ShippedApp = {
   period: string;
   domain: string;
   storeUrl: string;
+  /** How Luis relates to the app, shown under its name. Default: "Android app I worked on". */
+  relation?: string;
   /** What Luis did, phrased from the verified role facts only. */
   contribution: string;
   /** Shown under the gallery; honest about current listings vs. his time there. */
@@ -135,7 +137,8 @@ export const apps: ShippedApp[] = [
     period: "2022 – 2024",
     domain: "Medtech",
     storeUrl: "https://play.google.com/store/apps/details?id=com.ypsomed.ypu.demo",
-    contribution: "Lead Android engineer on the Ypsomed project: Android and iOS SDKs for the YpsoPump insulin pump, with a PKI / certificate-based mTLS channel to the device.",
+    contribution: "Android Tech Lead for the YpsoPump SDKs at Ypsomed (Android and iOS), including the PKI / certificate-based mTLS channel between the phone and the insulin pump.",
+    relation: "Android Tech Lead · YpsoPump SDKs",
     credit: "Screens from the current public Google Play listing · © Ypsomed",
     screens: [
       { src: "/apps/ypsopump/1.webp", alt: "YpsoPump Explorer: 3D pump simulator" },
@@ -427,7 +430,7 @@ export const askLuis = [
   {
     q: "What is Luis's Android experience?",
     keywords: ["android", "experience", "kotlin", "compose", "years"],
-    a: "13+ years in software, most of it on Android: Digidentity (2025–present), Lead Android Engineer on the Ypsomed medical-device project (2022–2024), Vodafone (2019–2022) and Unisys (2019). Stack: Kotlin, Jetpack Compose, Coroutines, Flow, Clean Architecture, MVVM/MVI, TDD and CI/CD.",
+    a: "13+ years in software, most of it on Android: Digidentity (2025–present), Android Tech Lead for the Ypsomed YpsoPump SDKs, medical-device project (2022–2024), Vodafone (2019–2022) and Unisys (2019). Stack: Kotlin, Jetpack Compose, Coroutines, Flow, Clean Architecture, MVVM/MVI, TDD and CI/CD.",
   },
   {
     q: "Tell me about his security experience.",
@@ -437,7 +440,7 @@ export const askLuis = [
   {
     q: "What does he know about mTLS?",
     keywords: ["mtls", "tls", "certificate", "pki", "x.509"],
-    a: "He implemented PKI and certificate-based mTLS authentication for the encrypted channel between an Android device and an EU medical self-injection device (Ypsomed, 2022–2024).",
+    a: "He implemented PKI and certificate-based mTLS authentication for the encrypted channel between an Android device and the YpsoPump insulin pump (Ypsomed, 2022–2024).",
   },
   {
     q: "How does he approach SDK architecture?",

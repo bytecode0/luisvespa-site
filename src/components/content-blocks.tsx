@@ -48,7 +48,7 @@ export function RecruiterSummary() {
   const facts = [
     ["Role", `${siteConfig.role} · ${summary.years}`],
     ["Now", "Digidentity — digital identity (2025–present)"],
-    ["Before", "Lead Android Engineer, Ypsomed medical device (InnoIT) · Vodafone · Unisys"],
+    ["Before", "Android Tech Lead, YpsoPump SDKs (Ypsomed, via InnoIT) · Vodafone · Unisys"],
     ["Security", "PKI, mTLS, certificate pinning, Keystore, digital signatures, passwordless login, DexGuard / R8"],
     ["AI / Agents", "Designed and runs an agentic SDLC: Claude Code, MCP (Jira, Figma, GitLab), on-device testing, human gates"],
     ["Location", `${siteConfig.location} · ${summary.eligibility}`],
