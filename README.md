@@ -27,8 +27,10 @@ Deploys as-is to Vercel or any static/Node host.
 
 | Environment | Git branch | Domain | Variables |
 | --- | --- | --- | --- |
-| Pre-production | `preprod` | `pre.luisvespa.com` | `NEXT_PUBLIC_SITE_ENV=preproduction`, `NEXT_PUBLIC_SITE_URL=https://pre.luisvespa.com` |
+| Pre-production | `preprod` | `pre.luisvespa.com` | none on Vercel (automatic from `VERCEL_ENV` / `VERCEL_GIT_COMMIT_REF`) |
 | Production | `main` | `www.luisvespa.com` | none (defaults) |
+
+Outside Vercel, `NEXT_PUBLIC_SITE_ENV=preproduction` and `NEXT_PUBLIC_SITE_URL` do the same (see `.env.example`).
 
 Pre-production is never indexed (robots.txt `Disallow: /`, `noindex` meta tag and `X-Robots-Tag` header)
 and shows a small `PRE-PRODUCTION` badge. See `.env.example`.
@@ -37,8 +39,7 @@ and shows a small `PRE-PRODUCTION` badge. See `.env.example`.
 
 1. Push this repo to a personal GitHub repository.
 2. Vercel → Add New → Project → import the repository (framework: Next.js, defaults are fine).
-3. Settings → Environment Variables: add the two pre-production variables above, scoped to
-   **Preview** and the branch `preprod`.
+3. No environment variables needed: every non-production deploy is automatically pre-production.
 4. Settings → Domains: add `pre.luisvespa.com` and assign it to the Git branch `preprod`.
    At your domain registrar, create `CNAME pre → cname.vercel-dns.com`.
 5. Every push to `preprod` deploys pre-production. Production = merge `preprod` into `main`

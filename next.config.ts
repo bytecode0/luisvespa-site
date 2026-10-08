@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
-const isPreproduction = process.env.NEXT_PUBLIC_SITE_ENV === "preproduction";
+// Same rule as src/config/site.ts: explicit flag, or any non-production Vercel deploy.
+const isPreproduction =
+  process.env.NEXT_PUBLIC_SITE_ENV === "preproduction" || process.env.VERCEL_ENV === "preview";
 
 /** Baseline security headers for every page. */
 const securityHeaders = [

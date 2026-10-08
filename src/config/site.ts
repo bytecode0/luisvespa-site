@@ -9,7 +9,9 @@ export const siteConfig = {
    * Public URL of the site, without trailing slash. Used for SEO, sitemap and OpenGraph.
    * Each environment can override it with NEXT_PUBLIC_SITE_URL (e.g. https://pre.luisvespa.com).
    */
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.luisvespa.com",
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_GIT_COMMIT_REF === "preprod" ? "https://pre.luisvespa.com" : "https://www.luisvespa.com"),
 
   name: "Luis Vespa",
   fullName: "Luis Manuel Vespa Peralta",
@@ -36,10 +38,12 @@ export const siteConfig = {
 } as const;
 
 /**
- * Pre-production (NEXT_PUBLIC_SITE_ENV=preproduction): never indexed by search engines,
- * and a small visible badge so nobody mistakes it for the real site.
+ * Pre-production: never indexed by search engines, and a small visible badge so nobody mistakes it
+ * for the real site. On Vercel this is automatic for every non-production deploy (VERCEL_ENV=preview,
+ * e.g. the preprod branch); elsewhere set NEXT_PUBLIC_SITE_ENV=preproduction.
  */
-export const isPreproduction = process.env.NEXT_PUBLIC_SITE_ENV === "preproduction";
+export const isPreproduction =
+  process.env.NEXT_PUBLIC_SITE_ENV === "preproduction" || process.env.VERCEL_ENV === "preview";
 
 /** True when a config URL still holds its placeholder value. */
 export function isPlaceholder(value: string): boolean {
