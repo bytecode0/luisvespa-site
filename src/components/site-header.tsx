@@ -146,7 +146,7 @@ export function SiteHeader() {
               onFocus={() => movePill(item.href)}
               aria-current={isActive(item.href) ? "page" : undefined}
               aria-label={item.label}
-              className={`group relative rounded-md px-2.5 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors hover:text-ink ${
+              className={`group relative shrink-0 whitespace-nowrap rounded-md px-2.5 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-colors hover:text-ink ${
                 item.href === activeHref ? "text-ink" : "text-muted"
               }`}
             >

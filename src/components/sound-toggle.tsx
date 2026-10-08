@@ -30,7 +30,7 @@ export function SoundToggle({ className = "", compact = false }: { className?: s
           />
         ))}
       </span>
-      <span aria-hidden className={compact ? "hidden 2xl:inline" : undefined}>
+      <span aria-hidden className={compact ? "hidden" : undefined}>
         <span className="text-faint">[</span> SOUND: {on ? "ON" : "OFF"} <span className="text-faint">]</span>
       </span>
     </button>
