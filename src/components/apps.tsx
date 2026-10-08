@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Play, X, ZoomIn } from "lucide-react";
 import type { ShippedApp } from "@/content/profile";
@@ -32,7 +33,9 @@ function Lightbox({ app, start, onClose }: { app: ShippedApp; start: number; onC
   }, [go, onClose]);
 
   const screen = app.screens[i];
-  return (
+  // Rendered on <body> through a portal: an animated (translated) ancestor would otherwise become the
+  // containing block of this position:fixed overlay and trap it inside a card.
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -66,7 +69,8 @@ function Lightbox({ app, start, onClose }: { app: ShippedApp; start: number; onC
         </div>
         <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-faint">{app.credit}</p>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
