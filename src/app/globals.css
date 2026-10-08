@@ -572,25 +572,12 @@ html[data-motion="on"] .is-visible .ping-once {
   left: 0;
   transform: none;
 }
-/* Control-plane spine: left gutter on mobile/tablet, centre from lg (1024px) up. */
-.spine.spine-responsive {
-  left: 11px;
-  transform: none;
-}
-@media (min-width: 1024px) {
-  .spine.spine-responsive {
-    left: 50%;
-    transform: translateX(-50%);
+/* Below lg the spine passes behind stacked cards: make glass cards opaque there so the line only shows in the gaps. */
+@media (max-width: 1023.98px) {
+  .tech-card {
+    background: var(--surface-2);
+    backdrop-filter: none;
   }
-}
-/* Short mobile connector from the node to the card; draws out like the desktop ones. */
-.connector-mobile {
-  background: linear-gradient(to right, var(--accent), rgba(59, 130, 246, 0.35));
-  transform-origin: left;
-  transition: transform 0.5s cubic-bezier(0.6, 0, 0.2, 1) 0.4s;
-}
-html[data-motion="on"] [data-reveal]:not(.is-visible) .connector-mobile {
-  transform: scaleX(0);
 }
 
 /* ---------- About: "technical psychedelic" profile ---------- */

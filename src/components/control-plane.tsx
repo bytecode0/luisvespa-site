@@ -57,20 +57,16 @@ function SpineNode() {
 }
 
 /**
- * Mobile/tablet version of the node: below lg the spine runs down the left gutter, so each module
- * gets a small node on it plus a short connector that draws out to the card.
+ * Below lg the blocks stack and the spine runs down the centre behind them (it shows in the gaps).
+ * This node sits in the gap between two stacked blocks, on the spine.
  */
-function MobileSpineNode() {
+function GapNode() {
   return (
-    <>
-      <div
-        aria-hidden
-        className="spine-node absolute -left-[35px] top-[5.25rem] z-20 flex size-5 items-center justify-center rounded-full border-2 border-line-strong bg-bg lg:hidden"
-      >
+    <div aria-hidden className="relative flex h-14 items-center justify-center lg:hidden">
+      <div className="spine-node relative z-20 flex size-6 items-center justify-center rounded-full border-2 border-line-strong bg-bg">
         <span className="size-1.5 rounded-full bg-accent" />
       </div>
-      <span aria-hidden className="connector-mobile absolute -left-[15px] top-[calc(5.25rem+9.5px)] h-px w-[15px] lg:hidden" />
-    </>
+    </div>
   );
 }
 
@@ -96,9 +92,9 @@ function SpineModule({
     <section id={id} aria-label={label} data-reveal data-sfx={sfx} className="relative z-10 py-16 lg:py-32">
       <span aria-hidden className="connector to-left hidden lg:block" />
       <span aria-hidden className="connector to-right hidden lg:block" />
-      <MobileSpineNode />
       <div className={`items-center justify-between gap-16 lg:flex ${reverse ? "lg:flex-row-reverse" : ""}`}>
-        <div className={`mb-10 lg:mb-0 lg:w-[45%] ${cardSide}`}>{card}</div>
+        <div className={`lg:w-[45%] ${cardSide}`}>{card}</div>
+        <GapNode />
         <SpineNode />
         <div className={`lg:w-[45%] ${asideSide}`} style={{ "--d": "180ms" } as CSSProperties}>
           {aside}
@@ -186,7 +182,6 @@ const securitySteps = [
 function SecurityModule() {
   return (
     <section id="security" aria-labelledby="security-title" data-reveal data-sfx="blip" className="relative z-10 py-16 lg:py-32">
-      <MobileSpineNode />
       <div className="relative mx-auto mb-14 max-w-md bg-bg py-2 text-center">
         <ShieldCheck className="mx-auto mb-4 size-5 text-accent" aria-hidden />
         <RevealTitle id="security-title" className="text-3xl">
@@ -195,6 +190,10 @@ function SecurityModule() {
         <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-accent">
           <Scramble text="DEFENSE IN DEPTH FOR ANDROID" trigger="view" delayMs={300} />
         </p>
+      </div>
+
+      <div className="-mt-6 mb-2">
+        <GapNode />
       </div>
 
       {/* The bus: a packet crosses the four stages; each stage lights up as it passes. */}
@@ -299,15 +298,13 @@ function AgentsModule() {
 export function ControlPlane() {
   return (
     <div className="relative mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-      {/* Below lg the modules leave a left gutter for the spine; from lg up it runs down the centre. */}
-      <div className="relative pl-9 lg:pl-0">
-      <Spine className="spine-responsive" />
+      {/* The spine runs down the centre at every size: between columns on desktop, behind stacked blocks below lg. */}
+      <Spine />
       <EngineeringModule />
       <SecurityModule />
       <AgentsModule />
       <div className="view-only-deep relative z-10 pb-16">
         <AgentTrace />
-      </div>
       </div>
     </div>
   );
