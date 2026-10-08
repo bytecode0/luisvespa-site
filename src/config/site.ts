@@ -19,7 +19,7 @@ export const siteConfig = {
   location: "Madrid, Spain",
 
   /** Contact */
-  email: "luis.vespa@outlook.es",
+  email: "contact@luisvespa.com",
   linkedin: "https://www.linkedin.com/in/luis-vespa-b6351447",
   github: "https://github.com/bytecode0",
 
