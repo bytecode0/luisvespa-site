@@ -75,7 +75,7 @@ export function RecruiterSummary() {
           Download CV
         </a>
         <Link
-          href="#contact"
+          href="/contact"
           className="rounded-sm border border-line-strong px-4 py-2.5 font-mono text-xs uppercase tracking-[0.12em] text-ink hover:border-accent hover:text-accent"
         >
           Contact

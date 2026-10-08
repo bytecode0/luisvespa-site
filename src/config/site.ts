@@ -26,6 +26,13 @@ export const siteConfig = {
   /** Path of the CV inside /public. Replace public/cv/luis-vespa-cv.pdf with your latest CV. */
   cvPath: "/cv/luis-vespa-cv.pdf",
 
+  /**
+   * Phone for WhatsApp / call buttons on /contact, obfuscated so scrapers don't harvest it from the HTML:
+   * base64 of the number written backwards. It is only decoded when a visitor clicks.
+   * To change it: run  node -e "console.log(Buffer.from('+34XXXXXXXXX'.split('').reverse().join('')).toString('base64'))"
+   */
+  phoneObfuscated: "NDUwOTU2NjY2NDMr",
+
   /** Shown in the footer status panel and the recruiter summary. */
   availability: "Open for new opportunities",
 

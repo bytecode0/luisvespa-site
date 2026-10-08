@@ -26,7 +26,7 @@ const items: Item[] = [
   { label: "Ask Luis", hint: "Experience", href: "/experience#ask", keywords: "questions assistant about" },
   { label: "Experience", hint: "Profile", href: "/experience", keywords: "about career timeline cv profile" },
   { label: "Download CV", hint: "PDF", href: siteConfig.cvPath, keywords: "resume curriculum" },
-  { label: "Contact", hint: "Contact", href: "#contact", keywords: "email linkedin github" },
+  { label: "Contact", hint: "Contact", href: "/contact", keywords: "email linkedin github whatsapp phone message form" },
 ];
 
 export function CommandPalette() {

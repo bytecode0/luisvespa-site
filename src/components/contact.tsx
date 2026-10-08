@@ -41,12 +41,12 @@ export function ContactSection(props: React.ComponentProps<"section">) {
             ))}
           </ul>
           <div className="mt-10 flex flex-wrap gap-3">
-            <a
-              href={`mailto:${siteConfig.email}`}
+            <Link
+              href="/contact"
               className="group inline-flex items-center gap-2 bg-accent px-6 py-3.5 font-mono text-xs uppercase tracking-[0.12em] text-white transition-colors hover:bg-accent-bright"
             >
               <Mail className="size-4 transition-transform group-hover:-rotate-12" aria-hidden /> Get in touch
-            </a>
+            </Link>
             <a
               href={siteConfig.cvPath}
               download
@@ -67,6 +67,7 @@ const footerNav = [
   { href: "/agents", label: "AI Agents" },
   { href: "/work", label: "Selected work" },
   { href: "/experience", label: "Experience" },
+  { href: "/contact", label: "Contact" },
 ];
 
 function buildDate() {

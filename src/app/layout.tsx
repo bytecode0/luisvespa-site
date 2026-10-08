@@ -7,6 +7,7 @@ import { CommandPalette } from "@/components/command-palette";
 import { ContactSection, SiteFooter } from "@/components/contact";
 import { viewModeBootScript } from "@/components/view-mode";
 import { InteractionLayer } from "@/components/interaction-layer";
+import { HideOn } from "@/components/hide-on";
 
 const plexSans = IBM_Plex_Sans({ variable: "--font-plex-sans", subsets: ["latin"], weight: ["300", "400", "500", "600"] });
 const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
@@ -82,7 +83,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="main" className="flex-1">
           {children}
         </main>
-        <ContactSection />
+        <HideOn paths={["/contact"]}>
+          <ContactSection />
+        </HideOn>
         <SiteFooter />
         <CommandPalette />
         <InteractionLayer />

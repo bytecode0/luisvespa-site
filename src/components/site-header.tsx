@@ -15,6 +15,7 @@ export const navItems = [
   { href: "/security", label: "Security", code: "02_SECURITY", spy: "security" },
   { href: "/agents", label: "AI / Agents", code: "03_AI_AGENTS", spy: "agents" },
   { href: "/experience", label: "Experience", code: "04_EXPERIENCE" },
+  { href: "/contact", label: "Contact", code: "05_CONTACT" },
 ];
 
 function openPalette() {
@@ -188,7 +189,7 @@ export function SiteHeader() {
             CV
           </a>
           <Link
-            href="#contact"
+            href="/contact"
             className="bg-accent px-4 py-2 font-mono text-xs uppercase tracking-[0.12em] text-white transition-colors hover:bg-accent-bright"
           >
             Connect
@@ -237,7 +238,7 @@ export function SiteHeader() {
                 Download CV
               </a>
               <Link
-                href="#contact"
+                href="/contact"
                 onClick={() => setOpen(false)}
                 className="bg-accent py-3 text-center font-mono text-xs uppercase tracking-[0.12em] text-white"
               >
