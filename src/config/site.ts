@@ -20,8 +20,8 @@ export const siteConfig = {
 
   /** Contact */
   email: "luis.vespa@outlook.es",
-  linkedin: "https://www.linkedin.com/in/REPLACE-ME",
-  github: "https://github.com/REPLACE-ME",
+  linkedin: "https://www.linkedin.com/in/luis-vespa-b6351447",
+  github: "https://github.com/bytecode0",
 
   /** Path of the CV inside /public. Replace public/cv/luis-vespa-cv.pdf with your latest CV. */
   cvPath: "/cv/luis-vespa-cv.pdf",
