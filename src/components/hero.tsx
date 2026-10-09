@@ -63,8 +63,8 @@ export function Hero() {
           </Link>
         </div>
 
-        <div className="block-in mx-auto mt-14 max-w-3xl" style={{ "--d": `${after + 300}ms` } as CSSProperties}>
-          <CompanyMarquee size="sm" />
+        <div className="block-in mt-16" style={{ "--d": `${after + 300}ms` } as CSSProperties}>
+          <CompanyMarquee size="lg" />
         </div>
 
         {/* The spine starts here and runs into the control plane below. */}
