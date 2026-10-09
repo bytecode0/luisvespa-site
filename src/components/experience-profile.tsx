@@ -2,19 +2,19 @@ import type { CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { appForRole, roles, summary } from "@/content/profile";
 import { AppThumb } from "@/components/apps";
+import { CompanyMarquee } from "@/components/company-marquee";
 import { Portrait } from "@/components/portrait";
 import { Spine } from "@/components/motion";
 import { TypeText } from "@/components/type-text";
 import { contactLinks } from "@/components/contact";
 import { stagger } from "@/components/ui";
 
-const companies = ["Digidentity", "Ypsomed (via InnoIT)", "Vodafone", "Unisys", "EVO Banco", "Wallbox", "PICKUP"];
 const careAbout = ["Android", "Security", "SDKs", "Identity", "Automation", "AI agents"];
 
 /** Experience page: sticky portrait + bio, glass CV timeline with typed titles, company band. */
 export function ExperienceProfile() {
   return (
-    <section aria-labelledby="profile-name" className="psyche-bg border-t border-line py-24 sm:py-32">
+    <section aria-labelledby="profile-name" className="psyche-bg border-t border-line pt-24 sm:pt-32">
       <div className="relative z-10 mx-auto max-w-6xl px-5 sm:px-8">
         <div className="flex flex-col gap-16 lg:flex-row">
           {/* Left: portrait and bio */}
@@ -144,26 +144,14 @@ export function ExperienceProfile() {
                 })}
               </ol>
 
-              {/* Companies, as plain text: no logos, no implied endorsements. */}
-              <div className="mt-20 border-t border-white/5 pt-10">
-                <p className="mb-8 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-accent">Worked with</p>
-                <div className="marquee overflow-hidden">
-                  <ul className="marquee-track gap-12 opacity-50 transition-opacity hover:opacity-90 md:gap-20">
-                    {[...companies, ...companies].map((c, i) => (
-                      <li
-                        key={`${c}-${i}`}
-                        aria-hidden={i >= companies.length}
-                        className="whitespace-nowrap pr-12 font-mono text-lg font-bold text-ink md:pr-20"
-                      >
-                        {c.toUpperCase()}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Companies band: full screen width, below both columns. */}
+      <div data-reveal className="relative z-10 mt-24 border-t border-white/5 bg-bg/30 py-12 backdrop-blur-sm">
+        <CompanyMarquee size="lg" />
       </div>
     </section>
   );

@@ -3,9 +3,8 @@ import type { CSSProperties } from "react";
 import { ChevronRight, GitBranch } from "lucide-react";
 import { Scramble } from "@/components/motion";
 import { TypeText } from "@/components/type-text";
+import { CompanyMarquee } from "@/components/company-marquee";
 
-/** Plain-text, monochrome company names: recognisable without using anyone's trademarks. */
-const companies = ["Digidentity", "Ypsomed (via InnoIT)", "Vodafone", "Unisys", "EVO Banco", "Wallbox"];
 
 const LABEL = "SYSTEM_INITIALIZED // SENIOR_ANDROID_ENGINEER";
 const TYPE_STEP = 18;
@@ -64,13 +63,8 @@ export function Hero() {
           </Link>
         </div>
 
-        <div className="block-in mt-14" style={{ "--d": `${after + 300}ms` } as CSSProperties}>
-          <p className="label">Worked with</p>
-          <ul className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-2 font-mono text-xs tracking-[0.06em] text-muted">
-            {companies.map((c) => (
-              <li key={c}>{c}</li>
-            ))}
-          </ul>
+        <div className="block-in mx-auto mt-14 max-w-3xl" style={{ "--d": `${after + 300}ms` } as CSSProperties}>
+          <CompanyMarquee size="sm" />
         </div>
 
         {/* The spine starts here and runs into the control plane below. */}

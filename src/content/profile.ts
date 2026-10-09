@@ -91,6 +91,9 @@ export const roles: Role[] = [
   },
 ];
 
+/** Companies Luis worked at, as plain text (no logos, no implied endorsements). Used by the company marquee. */
+export const companies = ["Digidentity", "Ypsomed (via InnoIT)", "Vodafone", "Unisys", "EVO Banco", "Wallbox", "PICKUP"];
+
 /**
  * Public apps from companies Luis worked at. Images are taken from the public Google Play listings
  * (promotional screenshots, credited to their owners). `role` must match a `roles[].company`.
